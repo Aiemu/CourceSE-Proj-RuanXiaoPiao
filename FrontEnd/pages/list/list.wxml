@@ -1,4 +1,0 @@
-<view>
-    <button bindtap="getList">活动列表</button>
-    <button open-type="getUserInfo" bindgetuserinfo="purchaseTicket">购票</button>
-</view>

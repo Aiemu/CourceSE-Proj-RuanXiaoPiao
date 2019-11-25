@@ -1,0 +1,8 @@
+<!--pages/profile/profile.wxml-->
+<view>
+  <mp-cells ext-class="my-cells" title="个人信息">
+    <mp-cell value="头像" footer="说明文字"></mp-cell>
+    <mp-cell value="昵称" footer="说明文字"></mp-cell>
+    <mp-cell value="是否认证" footer="说明文字"></mp-cell>
+  </mp-cells>
+</view>

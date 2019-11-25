@@ -1,0 +1,16 @@
+<!--pages/my_order/my_order.wxml-->
+<view class="header">活动列表</view>
+<view class="activity" bindtap="info">  
+  <image class="post"></image>
+  <view class="meta">
+    <text class="title">软件学院学生节</text>
+    <text class="date">2020.04.20</text>
+    <text class="location">大礼堂</text>
+    <text class="sponsor">软院学生会主办</text>
+    <text class="state">未开始</text>
+    <button size="mini" class="refund" bindtap="refund">
+      <view class="t">退票</view>
+    </button>
+  </view>
+</view>
+

@@ -1,0 +1,50 @@
+/* pages/my_collect/my_collect.wxss */
+.header{
+  margin-left: 10rpx;
+  font-size: 30rpx;
+  color: gray;
+}
+.activity{
+  display: flex;
+  justify-content: flex-start;
+  border-top: 5rpx solid gray;
+}
+.post{
+  width: 250rpx;
+  height: 280rpx;
+  margin-left: 50rpx;
+  margin-right: 50rpx;  
+}
+.meta{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.date{
+  font-size: 26rpx;
+  color:gray;
+}
+.location{
+  font-size: 26rpx;
+  color:gray;
+}
+.sponsor{
+  font-size: 26rpx;
+  color:gray;
+}
+.state{
+  font-size: 26rpx;
+  color:green;
+}
+
+.none{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.noneimg{
+  width: 300rpx;
+  height: 300rpx;
+  margin-top: 50rpx;
+  margin-bottom: 30rpx;
+}

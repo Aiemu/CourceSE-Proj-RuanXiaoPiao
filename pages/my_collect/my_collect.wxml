@@ -1,0 +1,17 @@
+<!--pages/my_collect/my_collect.wxml-->
+<view class="header">您收藏的活动</view>
+<view wx:if="{{has_activity}}" class="activity">
+  <image class="post"></image>
+  <view class="meta">
+    <text class="title">软件学院学生节</text>
+    <text class="date">2020.04.20</text>
+    <text class="location">大礼堂</text>
+    <text class="sponsor">软院学生会主办</text>
+    <text class="state">未开始</text>
+  </view>
+</view>
+<view wx:else class="none">
+  <image class="noneimg"></image>
+  <text class="nonetext">暂无关注的活动</text>
+</view>
+

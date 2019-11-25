@@ -1,4 +1,0 @@
-<view>
-    <button open-type="getUserInfo" bindgetuserinfo="bindGetOpenID">授权</button>
-    <button bindtap="saveTestData">存入数据</button>
-</view>
