@@ -27,7 +27,7 @@ Page({
                 console.log('获取购买 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    // info: e.detail.rawData,
+                    activity_id: 2, // TODO
                 };
                 wx.request({
                     url: 'http://127.0.0.1:8000/purchaseTicket/',
