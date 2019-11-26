@@ -31,7 +31,7 @@ class Activity(models.Model):
     # heat = models.FloatField()
     # description = models.CharField()
     time = models.CharField(max_length = 30, default = '0000.00.00 00:00') # TODO
-    place = models.CharField(max_length = 30, default = '无')
+    place = models.CharField(max_length = 30, default = 'none place')
     price = models.FloatField(default = 0.0)
     # keywords = models.ManyToManyField()
     
