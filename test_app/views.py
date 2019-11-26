@@ -79,7 +79,7 @@ def getList(request):
         }
         iJson = json.dumps(i)
         retList.append(iJson)
-        
+
     # ret msg
     ret = {'code': '001', 'msg': None,'data':{}}
     ret['msg'] = '获取活动列表成功'
@@ -96,8 +96,6 @@ def purchaseTicket(request):
     # code & userinfo
     js_code = request.POST.get('code')
     activity_id = request.POST.get('activity_id')
-
-    print('actid: ', request)
 
     # get openid
     url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
@@ -129,6 +127,77 @@ def purchaseTicket(request):
     }
     return JsonResponse(ret)
 
+def getTicketList(request):
+    # appid & secret
+    appid = 'wx4d722f66e80e339e'
+    appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
+
+    # code & userinfo
+    js_code = request.POST.get('code')
+
+    # get openid
+    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
+    response = json.loads(requests.get(url).content)
+    
+    # if fail
+    if 'errcode' in response:
+        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+
+    # openid & session_key
+    openid = response['openid']
+    session_key = response['session_key']
+    
+    # get user
+    user, created = User.objects.get_or_create(openid = openid)
+
+    # get user's tickets
+    ticList = user.ticket_set.all()
+    print(ticList[0].activity.activity_id)
+
+    # get retList
+    retList = []
+    for item in ticList:
+        i = {
+            'activity_id': item.activity.activity_id,
+            'title': item.activity.title,
+            'time': item.activity.time,
+            'place': item.activity.place,
+            'price': item.activity.price,
+            'owner': item.owner.username, 
+            'ticket_id': item.ticket_id,
+        }
+        iJson = json.dumps(i)
+        retList.append(iJson)
+
+    # ret msg
+    ret = {'code': '003', 'msg': None,'data':{}}
+    ret['msg'] = '获取已购票列表成功'
+    ret['data'] = {
+        'user': user.username,
+        'ticketList': retList,
+    }
+    return JsonResponse(ret)
+
+def getActivityInfo(request):
+    # code & userinfo
+    activity_id = request.POST.get('activity_id')
+
+    # get user & activity
+    activity, created = Activity.objects.get_or_create(activity_id = activity_id)
+
+    # ret msg
+    ret = {'code': '004', 'msg': None,'data':{}}
+    ret['msg'] = '活动详情获取成功'
+    ret['data'] = {
+        'activity_id': activity_id,
+        'title': activity.title,
+        'time': activity.time,
+        'place': activity.place,
+        'price': activity.price,
+    }
+    return JsonResponse(ret)
+
+
 def saveTestData(request):
     # test data for user
     openid = 'hello'
@@ -157,7 +226,7 @@ def saveTestData(request):
     ticket.save()
     
     # ret msg
-    ret = {'code': '003', 'msg': None,'data':{}}
+    ret = {'code': '005', 'msg': None,'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.username,
@@ -165,7 +234,6 @@ def saveTestData(request):
         'newTicket': ticket.ticket_id,
     }
     return JsonResponse(ret)
-
 
 def index(request):
     return HttpResponse("Hello world! You are at the test_app index.")

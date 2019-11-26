@@ -23,5 +23,7 @@ urlpatterns = [
     path('init/', views.init),
     path('getList/', views.getList),
     path('purchaseTicket/', views.purchaseTicket),
+    path('getTicketList/', views.getTicketList),
+    path('getActivityInfo/', views.getActivityInfo),
     path('saveTestData/', views.saveTestData),
 ]

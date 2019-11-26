@@ -20,6 +20,27 @@ Page({
         })
     },
 
+    getActivityInfo: function () {
+        var postData = {
+            activity_id: 2,
+        };
+        wx.request({
+            url: 'http://127.0.0.1:8000/getActivityInfo/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                console.log('getList-OK!');
+                console.log(res.data);
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
+    },
+
     purchaseTicket: function(e) {
         console.log(e.detail.rawData);
         wx.login({

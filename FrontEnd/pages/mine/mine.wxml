@@ -1,4 +1,5 @@
 <view>
     <button open-type="getUserInfo" bindgetuserinfo="bindGetOpenID">授权</button>
+    <button open-type="getUserInfo" bindgetuserinfo="bindGetTicketList">获取已购票列表</button>
     <button bindtap="saveTestData">存入数据</button>
 </view>
