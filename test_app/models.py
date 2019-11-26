@@ -43,7 +43,7 @@ class Ticket(models.Model):
     owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, default = '')
     activity = models.ForeignKey(Activity, on_delete=models.DO_NOTHING, default = '')
     # price = models.FloatField()
-    # is_valid = models.BooleanField()
+    is_valid = models.BooleanField(default=False)
     # is_checked = models.BooleanField()
 
     class Meta:

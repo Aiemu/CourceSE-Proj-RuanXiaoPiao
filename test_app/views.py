@@ -116,6 +116,10 @@ def purchaseTicket(request):
     # new ticket
     ticket = Ticket(owner = user, activity = activity)
 
+    # varify
+    ticket.is_valid = True
+
+    # save
     ticket.save()
 
     # ret msg
@@ -197,6 +201,64 @@ def getActivityInfo(request):
     }
     return JsonResponse(ret)
 
+def getTicketInfo(request):
+    # code & userinfo
+    ticket_id = request.POST.get('ticket_id')
+
+    # get user & activity
+    ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
+
+    # ret msg
+    ret = {'code': '005', 'msg': None,'data':{}}
+    ret['msg'] = '活动详情获取成功'
+    ret['data'] = {
+        'ticket_id': ticket_id,
+        'owner': ticket.owner.username,
+        'title': ticket.activity.title,
+        # TODO
+    }
+    return JsonResponse(ret)
+
+def refundTicket(request):
+    # appid & secret
+    appid = 'wx4d722f66e80e339e'
+    appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
+
+    # code & userinfo
+    js_code = request.POST.get('code')
+    ticket_id = request.POST.get('ticket_id')
+
+    # get openid
+    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
+    response = json.loads(requests.get(url).content)
+    
+    # if fail
+    if 'errcode' in response:
+        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+
+    # openid & session_key
+    openid = response['openid']
+    session_key = response['session_key']
+    
+    # get user & activity
+    user, created = User.objects.get_or_create(openid = openid)
+    ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
+
+    # unvarify
+    ticket.is_valid = False
+
+    # save
+    ticket.save()
+
+    # ret msg
+    ret = {'code': '006', 'msg': None,'data':{}}
+    ret['msg'] = '退票成功'
+    ret['data'] = {
+        'ticket_id': ticket_id,
+        'unvarify': ticket.is_valid,
+    }
+    return JsonResponse(ret)
+
 
 def saveTestData(request):
     # test data for user
@@ -226,7 +288,7 @@ def saveTestData(request):
     ticket.save()
     
     # ret msg
-    ret = {'code': '005', 'msg': None,'data':{}}
+    ret = {'code': '007', 'msg': None,'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.username,

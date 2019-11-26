@@ -25,5 +25,7 @@ urlpatterns = [
     path('purchaseTicket/', views.purchaseTicket),
     path('getTicketList/', views.getTicketList),
     path('getActivityInfo/', views.getActivityInfo),
+    path('getTicketInfo/', views.getTicketInfo),
+    path('refundTicket/', views.refundTicket),
     path('saveTestData/', views.saveTestData),
 ]
