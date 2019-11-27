@@ -217,7 +217,7 @@ def getTicketInfo(request):
         'ticket_id': ticket_id,
         'owner': ticket.owner.username,
         'title': ticket.activity.title,
-        # TODO
+        # TODO 购票时间、价格、二维码、活动时间、地点
     }
     return JsonResponse(ret)
 
