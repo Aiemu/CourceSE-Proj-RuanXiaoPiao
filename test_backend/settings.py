@@ -12,9 +12,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
-import pymysql
-pymysql.install_as_MySQLdb()
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -28,7 +25,7 @@ SECRET_KEY = 'tk#bptx5x8@86y%%^gt-d(=8a*%494uqz_bn@)i%gh54t_26uu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['62.234.50.47', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -86,7 +83,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'test_db',
-        'USER': 'root',
+        'USER': 'django',
+        'HOST': 'localhost', 
         'PASSWORD': '123456',
     }
 }

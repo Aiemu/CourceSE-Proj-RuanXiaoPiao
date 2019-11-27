@@ -16,7 +16,9 @@ from django_redis import get_redis_connection
 from .models import User, Activity, Ticket
 from .serializers import UserSerializer
 
-# @api_view(['POST'])
+@api_view(['POST'])
+
+# @api_view(['GET', 'POST', ])
 
 # from code to session
 def init(request):
