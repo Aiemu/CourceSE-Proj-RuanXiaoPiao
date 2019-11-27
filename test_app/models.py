@@ -4,7 +4,7 @@ from django.db import models
 
 class User(models.Model):
     # basic info
-    user_id = models.AutoField(primary_key = True) # autofield自动改变
+    user_id = models.AutoField(primary_key = True)
     openid = models.CharField( max_length = 30)
     username = models.CharField(max_length = 30)
     password = models.CharField(max_length = 30)
@@ -21,13 +21,13 @@ class User(models.Model):
 class Activity(models.Model):
     activity_id = models.AutoField(primary_key = True)
     title = models.CharField(max_length = 30)
-    # image = models.ImageField() # TODO
-    # status = models.ChoiceField() # TODO 每次获取活动信息则更新
-    # remain = models.IntegerField(default = 0) # TODO 每生成一张票++，每退一张--
-    # publisher = models.CharField() # TODO
+    image = models.ImageField(upload_to = 'images', default = 'default/test_image.jpg') # TODO 图片的默认值与图片路径的关系有待确定
+    status = models.CharField(max_length = 20, default = '正在抢票')
+    remain = models.IntegerField(default = 0)
+    publisher = models.CharField(max_length = 30, default = 'unknown publisher')
     # heat = models.FloatField() # TO BE DEFINED
-    # description = models.CharField() # TODO
-    time = models.CharField(max_length = 30, default = '0000.00.00 00:00') # TODO
+    description = models.CharField(max_length = 1024, default = '哎呀，这个活动的介绍文字似乎走丢了...') # WARNING: max_length 似乎指定的是字符数而非字节数
+    time = models.DateTimeField(default = '2019-10-10 12:30:00')
     place = models.CharField(max_length = 30, default = 'none place')
     price = models.FloatField(default = 0.0)
     # keywords = models.ManyToManyField() # 搜索 分词 关键词
@@ -40,7 +40,8 @@ class Ticket(models.Model):
     owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, default = '')
     activity = models.ForeignKey(Activity, on_delete=models.DO_NOTHING, default = '')
     is_valid = models.BooleanField(default=False)
-    # purchaseTime = models.DatetimeField() # TODO 生成票时设置
+    purchaseTime = models.DateTimeField('购票日期', auto_now_add = True) # PS:auto_now_add使之为readonly。若需修改puchaseTime，则此处应改用default = timezone.now
+                                                                    # WARMNING:修改含auto_now或auto_now_add的字段时，需先改为default = 'xxxx-xx-xx xx:xx:xx'并完成一次迁移
     # QRCode = models.ImageField() # TODO
     # is_checked = models.BooleanField()
 

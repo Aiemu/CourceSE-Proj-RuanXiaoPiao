@@ -5,6 +5,7 @@ import rest_framework
 import pymysql.cursors
 import pymysql
 import pandas as pds
+import datetime
 
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -13,12 +14,17 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 from django_redis import get_redis_connection
+from django.core.files.base import ContentFile
 from .models import User, Activity, Ticket
 from .serializers import UserSerializer
 
 @api_view(['POST'])
 
 # @api_view(['GET', 'POST', ])
+
+# 尝试用global来将class DateEncoder置于全局，不幸失败
+
+# 建议：把appid和appsecret放到全局
 
 # from code to session
 def init(request):
@@ -68,20 +74,43 @@ def init(request):
     }
     return JsonResponse(ret)
 
+# 现在getList会在返回活动列表的同时检测这些活动是否结束或者无票
 def getList(request):
+    # 重写json序列化类，特判datetime类型（这个类不可写在函数外，否则将引起特殊问题）
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            # elif isinstance(obj, date):
+            #     return obj.strftime("%Y-%m-%d")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
     actList = Activity.objects.all()
     retList = []
     for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = '已结束'
+        elif item.remain <= 0:
+            item.status = '已售空'
+        item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
         i = {
             'activity_id': item.activity_id, 
             'title': item.title, 
-            'time': item.time, 
+            # 'image': item.image, # 结合活动信息应该在json里传出的设定，似乎image更多指的是图片在服务器中的路径？
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
             'place': item.place, 
             'price': item.price
         }
-        iJson = json.dumps(i)
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
         retList.append(iJson)
-
+    
     # ret msg
     ret = {'code': '001', 'msg': None,'data':{}}
     ret['msg'] = '获取活动列表成功'
@@ -111,29 +140,44 @@ def purchaseTicket(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user & activity
-    user, created = User.objects.get_or_create(openid = openid)
-    activity, created = Activity.objects.get_or_create(activity_id = activity_id)
+    # get user & activity # 除遍历外，可能有其它的方法能够根据openid和activity_id获取对象，譬如getItemByID（误）。这里假定已经取出了目标user和activity
+    user, created = User.objects.get_or_create(openid = openid) # TODO: Deal with get_or_create
+    activity, created = Activity.objects.get_or_create(activity_id = activity_id) # TODO: Deal with get_or_create
 
-    # new ticket
-    ticket = Ticket(owner = user, activity = activity)
+    # 判断活动是否还有余票
+    if activity.remain <= 0:
+        activity.remain = 0 # 这行是写来充数的，换成发购票失败消息的操作
+    else:
+        # activity changes
+        activity.remain -= 1 # decrease remain
+        activity.save()
 
-    # varify
-    ticket.is_valid = True
+        # ticket changes
+        ticket = Ticket(owner = user, activity = activity) # new ticket
+        ticket.is_valid = True # varify
+        ticket.save()
 
-    # save
-    ticket.save()
+        # user changes ?
 
-    # ret msg
-    ret = {'code': '002', 'msg': None,'data':{}}
-    ret['msg'] = '购票成功'
-    ret['data'] = {
-        'user': user.username,
-        'activity_id': activity_id,
-    }
+        # ret msg
+        ret = {'code': '002', 'msg': None,'data':{}}
+        ret['msg'] = '购票成功'
+        ret['data'] = {
+            'user': user.username,
+            'activity_id': activity_id,
+        }
+
     return JsonResponse(ret)
 
 def getTicketList(request):
+    # 引用新class
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
     # appid & secret
     appid = 'wx4d722f66e80e339e'
     appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
@@ -153,26 +197,27 @@ def getTicketList(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user
+    # get user # 同理，这里假定已经取出了目标user
     user, created = User.objects.get_or_create(openid = openid)
 
     # get user's tickets
-    ticList = user.ticket_set.all()
-    print(ticList[0].activity.activity_id)
+    # ticList = user.ticket_set.all() # user下已无ticket_set字段，应该寻找与user外联的ticket存入ticketList
+    # print(ticList[0].activity.activity_id)
 
     # get retList
     retList = []
     for item in ticList:
         i = {
+            'ticket_id': item.ticket_id,
+            'owner': item.owner.username, 
             'activity_id': item.activity.activity_id,
             'title': item.activity.title,
             'time': item.activity.time,
             'place': item.activity.place,
             'price': item.activity.price,
-            'owner': item.owner.username, 
-            'ticket_id': item.ticket_id,
+
         }
-        iJson = json.dumps(i)
+        iJson = json.dumps(i, cls = DateEncoder)
         retList.append(iJson)
 
     # ret msg
@@ -188,7 +233,7 @@ def getActivityInfo(request):
     # code & userinfo
     activity_id = request.POST.get('activity_id')
 
-    # get user & activity
+    # get user & activity # 同理
     activity, created = Activity.objects.get_or_create(activity_id = activity_id)
 
     # ret msg
@@ -197,17 +242,22 @@ def getActivityInfo(request):
     ret['data'] = {
         'activity_id': activity_id,
         'title': activity.title,
+        # 'image': activity.image,
+        'status': activity.status,
+        'remain': activity.remain,
+        'publisher': activity.publisher,
+        'description': activity.description,
         'time': activity.time,
         'place': activity.place,
         'price': activity.price,
-    }
+    } # 与之前的两个函数有不同。需要dumps吗？需要就加上class
     return JsonResponse(ret)
 
 def getTicketInfo(request):
     # code & userinfo
     ticket_id = request.POST.get('ticket_id')
 
-    # get user & activity
+    # get user & activity # 同理
     ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
 
     # ret msg
@@ -217,8 +267,12 @@ def getTicketInfo(request):
         'ticket_id': ticket_id,
         'owner': ticket.owner.username,
         'title': ticket.activity.title,
-        # TODO 购票时间、价格、二维码、活动时间、地点
-    }
+        'price': ticket.activity.price,
+        'place': ticket.activity.place,
+        'tic_time': ticket.purchaseTime,
+        'act_time': ticket.activity.time,
+        # 'QRCode': ticket.QRCode,
+    } # 同理，需要dumps吗？
     return JsonResponse(ret)
 
 def refundTicket(request):
@@ -242,15 +296,20 @@ def refundTicket(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user & activity
+    # get user & activity # 同理
     user, created = User.objects.get_or_create(openid = openid)
     ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
+    activity = ticket.activity
 
-    # unvarify
-    ticket.is_valid = False
+    # activity changes
+    activity.remain += 1
+    activity.save()
 
-    # save
+    # ticket changes
+    ticket.is_valid = False # unvarify
     ticket.save()
+
+    # user changes ?
 
     # ret msg
     ret = {'code': '006', 'msg': None,'data':{}}
@@ -261,43 +320,65 @@ def refundTicket(request):
     }
     return JsonResponse(ret)
 
-
+# 初始化测试数据库
 def saveTestData(request):
     # test data for user
-    openid = 'hello'
+    openid = 'testOpenid'
 
     user, created = User.objects.get_or_create(openid = openid)
     user_str = str(UserSerializer(user).data)
 
-    user.username = 'testName'
+    user.username = 'testUser'
     user.password = openid
 
     user.save()
 
     # test data for acvivity
-    title = 'Test activity 2'
-    activity, created = Activity.objects.get_or_create(title = title)
+    activity1, created = Activity.objects.get_or_create(title = 'testActivity 1')
 
-    activity.time = '2019.08.27 9:00'
-    activity.place = '大礼堂'
-    activity.price = 123
+    # #  图片文件读取测试
+    # file_content = ContentFile(request.FILES['img'].read())
+    # activity1.image = ImageStore(name = request.FILES['img'].name, img = request.FILES['img'])
 
-    activity.save()
+    activity1.remain = 100
+    activity1.time = '2019-12-30 12:30:00'
+    activity1.place = '大礼堂'
+    activity1.price = 123
+    activity1.publisher = '软件学院项目部'
 
-    # test data for ticket
-    ticket = Ticket(owner = user, activity = activity)
+    activity1.save()
 
-    ticket.save()
+    activity2, created = Activity.objects.get_or_create(title = 'testActivity 2')
+    activity2.remain = 50
+    activity2.time = '2018-12-01 12:30:00'
+    activity2.place = '紫荆运动场'
+    activity2.price = 50
+    activity2.description = '这是一场已经结束的足球比赛。'
+    activity2.publisher = '清华大学足球协会'
+
+    activity2.save()
+
+    # # test data for ticket
+    # ticket = Ticket(owner = user, activity = activity)
+    # ticket.save()
     
     # ret msg
     ret = {'code': '007', 'msg': None,'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.username,
-        'newActivity': activity.title,
-        'newTicket': ticket.ticket_id,
+        'newActivity': [activity1.title, activity2.title]
+        # 'newTicket': ticket.ticket_id,
     }
     return JsonResponse(ret)
 
 def index(request):
-    return HttpResponse("Hello world! You are at the test_app index.")
+    return HttpResponse("Hello! You are at the index page of test_app.")
+
+# 仅测试用，可以删除，注意url也要对应删
+def changeData(request):
+    actList = Activity.objects.all()
+    for item in actList:
+        item.remain -= 1 #= item.remain + 1
+        item.save()
+    return HttpResponse("Hey! I have changed the datebase.")

@@ -28,4 +28,6 @@ urlpatterns = [
     path('getTicketInfo/', views.getTicketInfo),
     path('refundTicket/', views.refundTicket),
     path('saveTestData/', views.saveTestData),
+    path('changeData/', views.changeData),
+    # TODO 搜索功能
 ]
