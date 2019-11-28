@@ -320,6 +320,9 @@ def refundTicket(request):
     }
     return JsonResponse(ret)
 
+def searchEngine(request):
+    pass
+
 # 初始化测试数据库
 def saveTestData(request):
     # test data for user
