@@ -21,13 +21,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.index),
     path('init/', views.init),
-    path('getList/', views.getList),
+    path('getActivityList/', views.getActivityList),
     path('purchaseTicket/', views.purchaseTicket),
     path('getTicketList/', views.getTicketList),
     path('getActivityInfo/', views.getActivityInfo),
     path('getTicketInfo/', views.getTicketInfo),
     path('refundTicket/', views.refundTicket),
+    path('searchEngine/', views.searchEngine),
     path('saveTestData/', views.saveTestData),
     path('changeData/', views.changeData),
-    # TODO 搜索功能
 ]

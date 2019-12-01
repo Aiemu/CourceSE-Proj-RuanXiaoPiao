@@ -6,6 +6,8 @@ import pymysql.cursors
 import pymysql
 import pandas as pds
 import datetime
+import jieba
+import re
 
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -75,7 +77,7 @@ def init(request):
     return JsonResponse(ret)
 
 # 现在getList会在返回活动列表的同时检测这些活动是否结束或者无票
-def getList(request):
+def getActivityList(request):
     # 重写json序列化类，特判datetime类型（这个类不可写在函数外，否则将引起特殊问题）
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -140,13 +142,19 @@ def purchaseTicket(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user & activity # 除遍历外，可能有其它的方法能够根据openid和activity_id获取对象，譬如getItemByID（误）。这里假定已经取出了目标user和activity
+    # get user & activity
     user, created = User.objects.get_or_create(openid = openid) # TODO: Deal with get_or_create
     activity, created = Activity.objects.get_or_create(activity_id = activity_id) # TODO: Deal with get_or_create
 
-    # 判断活动是否还有余票
+    # is remain?
     if activity.remain <= 0:
-        activity.remain = 0 # 这行是写来充数的，换成发购票失败消息的操作
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '购票失败'
+        ret['data'] = {
+            'user': user.username,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
     else:
         # activity changes
         activity.remain -= 1 # decrease remain
@@ -166,8 +174,7 @@ def purchaseTicket(request):
             'user': user.username,
             'activity_id': activity_id,
         }
-
-    return JsonResponse(ret)
+        return JsonResponse(ret)
 
 def getTicketList(request):
     # 引用新class
@@ -177,7 +184,7 @@ def getTicketList(request):
                 return obj.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 return json.JSONEncoder.default(self, obj)
-    
+
     # appid & secret
     appid = 'wx4d722f66e80e339e'
     appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
@@ -197,11 +204,11 @@ def getTicketList(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user # 同理，这里假定已经取出了目标user
+    # get user
     user, created = User.objects.get_or_create(openid = openid)
 
     # get user's tickets
-    # ticList = user.ticket_set.all() # user下已无ticket_set字段，应该寻找与user外联的ticket存入ticketList
+    ticList = user.ticket_set.all()
     # print(ticList[0].activity.activity_id)
 
     # get retList
@@ -262,7 +269,7 @@ def getTicketInfo(request):
 
     # ret msg
     ret = {'code': '005', 'msg': None,'data':{}}
-    ret['msg'] = '活动详情获取成功'
+    ret['msg'] = '票详情获取成功'
     ret['data'] = {
         'ticket_id': ticket_id,
         'owner': ticket.owner.username,
@@ -321,7 +328,62 @@ def refundTicket(request):
     return JsonResponse(ret)
 
 def searchEngine(request):
-    pass
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            # elif isinstance(obj, date):
+            #     return obj.strftime("%Y-%m-%d")
+            else:
+                return json.JSONEncoder.default(self, obj)
+
+    line = request.POST.get('line')
+
+    wordList = jieba.lcut_for_search(line)
+    actList = Activity.objects.all()
+    retList = {}
+
+    # search
+    for word in wordList:
+        for act in actList:
+            size = len(re.findall(word, act.title)) + \
+                len(re.findall(word, act.publisher)) + \
+                len(re.findall(word, act.description)) + \
+                len(re.findall(word, act.place))
+            if size > 0:
+                if act.activity_id not in retList:  
+                    retList[act.activity_id] = {}
+                retList[act.activity_id][word] = size
+
+    # sort with len
+    sortedList = sorted(retList.items(), key = lambda x:len(x[1]), reverse=True)
+    
+    # trans list into dic
+    retactList = []
+    for item in sortedList:
+        item = Activity.objects.get(activity_id=item[0])
+        i = {
+                'activity_id': item.activity_id, 
+                'title': item.title, 
+                # 'image': item.image, # 结合活动信息应该在json里传出的设定，似乎image更多指的是图片在服务器中的路径？
+                'status': item.status,
+                'remain': item.remain,
+                'publisher': item.publisher,
+                'description': item.description,
+                'time': item.time,
+                'place': item.place, 
+                'price': item.price
+            }
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retactList.append(iJson)
+
+    # ret
+    ret = {'code': '007', 'msg': None,'data':{}}
+    ret['msg'] = '搜索成功'
+    ret['data'] = {
+        'actList': retactList,
+    }
+    return JsonResponse(ret)
 
 # 初始化测试数据库
 def saveTestData(request):
@@ -345,18 +407,18 @@ def saveTestData(request):
 
     activity1.remain = 100
     activity1.time = '2019-12-30 12:30:00'
-    activity1.place = '大礼堂'
+    activity1.place = '大礼堂大礼堂大礼堂'
     activity1.price = 123
     activity1.publisher = '软件学院项目部'
 
     activity1.save()
 
-    activity2, created = Activity.objects.get_or_create(title = 'testActivity 2')
+    activity2, created = Activity.objects.get_or_create(title = 'testActivity 5')
     activity2.remain = 50
-    activity2.time = '2018-12-01 12:30:00'
-    activity2.place = '紫荆运动场'
+    activity2.time = '2019-12-01 12:30:00'
+    activity2.place = '大礼堂项目部项目部项目部'
     activity2.price = 50
-    activity2.description = '这是一场已经结束的足球比赛。'
+    activity2.description = '这是一场足球比赛。'
     activity2.publisher = '清华大学足球协会'
 
     activity2.save()
@@ -366,7 +428,7 @@ def saveTestData(request):
     # ticket.save()
     
     # ret msg
-    ret = {'code': '007', 'msg': None,'data':{}}
+    ret = {'code': '008', 'msg': None,'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.username,

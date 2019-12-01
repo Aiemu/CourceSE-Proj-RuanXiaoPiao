@@ -23,14 +23,14 @@ class Activity(models.Model):
     title = models.CharField(max_length = 30)
     image = models.ImageField(upload_to = 'images', default = 'default/test_image.jpg') # TODO 图片的默认值与图片路径的关系有待确定
     status = models.CharField(max_length = 20, default = '正在抢票')
-    remain = models.IntegerField(default = 0)
+    remain = models.IntegerField(default = 100)
     publisher = models.CharField(max_length = 30, default = 'unknown publisher')
-    # heat = models.FloatField() # TO BE DEFINED
+    heat = models.FloatField(default = 0.0) # TO BE DEFINED
     description = models.CharField(max_length = 1024, default = '哎呀，这个活动的介绍文字似乎走丢了...') # WARNING: max_length 似乎指定的是字符数而非字节数
     time = models.DateTimeField(default = '2019-10-10 12:30:00')
     place = models.CharField(max_length = 30, default = 'none place')
     price = models.FloatField(default = 0.0)
-    # keywords = models.ManyToManyField() # 搜索 分词 关键词
+    # keywords = models.() # 搜索 分词 关键词
     
     class Meta:
         db_table = 'Activity'
