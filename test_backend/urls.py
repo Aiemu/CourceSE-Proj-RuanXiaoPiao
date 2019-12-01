@@ -17,6 +17,9 @@ from django.contrib import admin
 from django.urls import include, path
 from test_app import views
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.index),
@@ -30,4 +33,7 @@ urlpatterns = [
     path('searchEngine/', views.searchEngine),
     path('saveTestData/', views.saveTestData),
     path('changeData/', views.changeData),
+    # path('showPicture/', views.showPicture),
+    # path('getPath/', views.getPath),
+    # TODO 搜索功能
 ]
