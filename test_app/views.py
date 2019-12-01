@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import requests
 import rest_framework
 import pymysql.cursors
@@ -385,3 +386,30 @@ def changeData(request):
         item.remain -= 1 #= item.remain + 1
         item.save()
     return HttpResponse("Hey! I have changed the datebase.")
+
+# # 同样仅测试用的显示图片函数
+# def showPicture(request):
+#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#     image_path = os.path.join(base_dir, request.GET['path'])
+#     image_data = open(image_path, 'rb').read()
+#     return HttpResponse(image_data, content_type = 'image/jpg')
+
+# # 这是将图片路径传递给前端的测试函数。。。。
+# def getPath(request):
+#     # # ret msg
+#     # ret = {'code': '007', 'msg': None,'data':{}}
+#     # ret['msg'] = '获得图片路径'
+#     # ret['data'] = {
+#     #     'ticket_id': ticket_id,
+#     #     'unvarify': ticket.is_valid,
+#     # }
+#     # return JsonResponse(ret)
+    
+#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#     activity, created = Activity.objects.get_or_create(activity_id = 1)
+#     image_path = os.path.join(base_dir, activity.image)
+#     image_data = open(image_path, 'rb').read()
+#     return HttpResponse(image_data, content_type = 'image/jpg')
+
+    
+#     # showPicture/?path=media/default/test_image.jpg
