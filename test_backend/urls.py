@@ -21,19 +21,18 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('index/', views.index),
-    path('init/', views.init),
-    path('getActivityList/', views.getActivityList),
-    path('purchaseTicket/', views.purchaseTicket),
-    path('getTicketList/', views.getTicketList),
-    path('getActivityInfo/', views.getActivityInfo),
-    path('getTicketInfo/', views.getTicketInfo),
-    path('refundTicket/', views.refundTicket),
-    path('searchEngine/', views.searchEngine),
-    path('saveTestData/', views.saveTestData),
-    path('changeData/', views.changeData),
+    path('admin/', admin.site.urls), # 管理
+    path('index/', views.index), # HelloWorld测试界面
+    path('init/', views.init), #授权
+    path('getActivityList/', views.getActivityList), # 获取活动列表
+    path('purchaseTicket/', views.purchaseTicket), # 购票
+    path('getTicketList/', views.getTicketList), # 获取已购票列表
+    path('getActivityInfo/', views.getActivityInfo), # 获取活动详情
+    path('getTicketInfo/', views.getTicketInfo), # 获取票的详情
+    path('refundTicket/', views.refundTicket), # 退票
+    path('searchEngine/', views.searchEngine), # 搜索
+    path('saveTestData/', views.saveTestData), # 存入测试数据
+    path('changeData/', views.changeData), # 
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
-    # TODO 搜索功能
-] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) 
+]
