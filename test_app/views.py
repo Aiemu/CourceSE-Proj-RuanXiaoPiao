@@ -21,9 +21,10 @@ from django.core.files.base import ContentFile
 from .models import User, Activity, Ticket
 from .serializers import UserSerializer
 
-@api_view(['POST'])
+appid = 'wx7d93bbb34a8d3662'
+appsecret = '4acadab52b5a08cd3166d4743c39f3f8'
 
-# @api_view(['GET', 'POST', ])
+@api_view(['POST'])
 
 # 尝试用global来将class DateEncoder置于全局，不幸失败
 
@@ -31,10 +32,6 @@ from .serializers import UserSerializer
 
 # from code to session
 def init(request):
-    # appid & secret
-    appid = 'wx4d722f66e80e339e'
-    appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
-
     # code & userinfo
     js_code = request.POST.get('code')
     user_info = request.POST.get('info')
@@ -123,10 +120,6 @@ def getActivityList(request):
     return JsonResponse(ret)
 
 def purchaseTicket(request):
-    # appid & secret
-    appid = 'wx4d722f66e80e339e'
-    appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
-
     # code & userinfo
     js_code = request.POST.get('code')
     activity_id = request.POST.get('activity_id')
@@ -187,10 +180,6 @@ def getTicketList(request):
                 return obj.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 return json.JSONEncoder.default(self, obj)
-
-    # appid & secret
-    appid = 'wx4d722f66e80e339e'
-    appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
 
     # code & userinfo
     js_code = request.POST.get('code')
@@ -286,10 +275,6 @@ def getTicketInfo(request):
     return JsonResponse(ret)
 
 def refundTicket(request):
-    # appid & secret
-    appid = 'wx4d722f66e80e339e'
-    appsecret = 'c9e072d2c443a1e2680f31db7a73ff72'
-
     # code & userinfo
     js_code = request.POST.get('code')
     ticket_id = request.POST.get('ticket_id')
