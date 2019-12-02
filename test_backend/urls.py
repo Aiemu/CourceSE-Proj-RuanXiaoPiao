@@ -35,5 +35,4 @@ urlpatterns = [
     path('changeData/', views.changeData),
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
-    # TODO 搜索功能
 ]

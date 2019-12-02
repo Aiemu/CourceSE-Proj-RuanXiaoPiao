@@ -1,10 +1,10 @@
 Page({
-    getList: function() {
+    getActivityList: function() {
         var postData = {
             str: 'get list'
         };
         wx.request({
-            url: 'http://127.0.0.1:8000/getList/',
+            url: 'http://62.234.50.47/getActivityList/',
             data: postData,
             method: 'POST',
             header: {
@@ -22,10 +22,10 @@ Page({
 
     getActivityInfo: function () {
         var postData = {
-            activity_id: 2,
+            activity_id: 1,
         };
         wx.request({
-            url: 'http://127.0.0.1:8000/getActivityInfo/',
+            url: 'http://62.234.50.47/getActivityInfo/',
             data: postData,
             method: 'POST',
             header: {
@@ -48,10 +48,10 @@ Page({
                 console.log('获取购买 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    activity_id: 2, // TODO
+                    activity_id: 3, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/purchaseTicket/',
+                    url: 'http://62.234.50.47/purchaseTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -71,6 +71,27 @@ Page({
                 console('登录获取Code失败！');
             }
         })
-    }
+    },
+
+    searchEngine: function () {
+        var postData = {
+            line: '大礼堂项目部'
+        };
+        wx.request({
+            url: 'http://62.234.50.47/searchEngine/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                console.log('search-OK!');
+                console.log(res.data);
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
+    },
 }
 )

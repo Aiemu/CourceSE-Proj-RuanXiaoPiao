@@ -154,6 +154,7 @@ def purchaseTicket(request):
         ret['data'] = {
             'user': user.username,
             'activity_id': activity_id,
+            'remain': activity.remain,
         }
         return JsonResponse(ret)
     else:
@@ -174,6 +175,7 @@ def purchaseTicket(request):
         ret['data'] = {
             'user': user.username,
             'activity_id': activity_id,
+            'remain': activity.remain,
         }
         return JsonResponse(ret)
 
