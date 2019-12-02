@@ -36,4 +36,4 @@ urlpatterns = [
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
     # TODO 搜索功能
-]
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) 

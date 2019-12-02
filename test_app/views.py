@@ -408,19 +408,21 @@ def saveTestData(request):
 
     activity1.remain = 100
     activity1.time = '2019-12-30 12:30:00'
-    activity1.place = '大礼堂大礼堂大礼堂'
+    activity1.place = '大礼堂'
     activity1.price = 123
     activity1.publisher = '软件学院项目部'
+    # activity1.heat = 10.0
 
     activity1.save()
 
     activity2, created = Activity.objects.get_or_create(title = 'testActivity 5')
     activity2.remain = 50
     activity2.time = '2019-12-01 12:30:00'
-    activity2.place = '大礼堂项目部项目部项目部'
+    activity2.place = '紫荆操场'
     activity2.price = 50
     activity2.description = '这是一场足球比赛。'
     activity2.publisher = '清华大学足球协会'
+    # activity2.heat = 9.9
 
     activity2.save()
 
