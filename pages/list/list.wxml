@@ -1,0 +1,33 @@
+<view>
+    <van-search placeholder="活动名称" value="{{search}}"></van-search>
+</view>
+<view>
+    <swiper indicator-dots="true" indicator-active-color="#fff" autoplay circular>
+        <swiper-item wx:for="{{banners}}" wx:key="">
+            <view>{{item}}</view>
+        </swiper-item>
+    </swiper>
+</view>
+<view>
+    <van-tabs>
+    <van-tab title="全部">
+        <view class="activity" wx:for="{{activityList}}" wx:for-item="activity" wx:key="id" data-id="{{activity.id}}" bindtap="toDetailsTap">  
+            <image class="post" src="{{activity.image}}"></image>
+            <view class="meta">
+                <text class="title">{{activity.title}}</text>
+                <text class="date">{{activity.date}}</text>
+                <text class="location">{{activity.location}}</text>
+                <text class="sponsor">{{activity.sponsor}}</text>
+                <view class="lastline">
+                  <!--TODO: 添加状态内容 -->
+                  <text wx:if="{{activity.state == 0}}" class="state">售票中</text>
+                  <text wx:if="{{activity.price}}">{{activity.price}}元</text>
+                  <text class="hot">{{activity.hot}}</text>
+                </view>
+            </view>
+        </view>
+    </van-tab>
+    <van-tab title="筛选1">内容 2</van-tab>
+    <van-tab title="筛选2">内容 3</van-tab>
+    </van-tabs>
+ </view>
