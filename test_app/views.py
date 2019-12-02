@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import hashlib
 import json
 import os
@@ -95,9 +97,9 @@ def getActivityList(request):
         # update status
         current_time = datetime.datetime.now()
         if item.time <= current_time:
-            item.status = '已结束'
+            item.status = u'已结束'
         elif item.remain <= 0:
-            item.status = '已售空'
+            item.status = u'已售空'
         item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
         i = {
             'activity_id': item.activity_id, 
