@@ -25,6 +25,7 @@ class Activity(models.Model):
     status = models.CharField(max_length = 20, default = '正在抢票')
     remain = models.IntegerField(default = 100)
     publisher = models.CharField(max_length = 30, default = 'unknown publisher')
+    
     heat = models.FloatField(default = 0.0) # TO BE DEFINED
     description = models.CharField(max_length = 1024, default = '哎呀，这个活动的介绍文字似乎走丢了...') # WARNING: max_length 似乎指定的是字符数而非字节数
     time = models.DateTimeField(default = '2019-10-10 12:30:00')
