@@ -1,18 +1,20 @@
 //富文本转换器
-import Dialog from '../../vant-weapp/dialog/dialog';
+import Dialog from '../../vant-weapp/dialog/dialog'
+import Toast from '../../vant-weapp/toast/toast'
 let WxParse = require('../../wxParse/wxParse.js')
 
 
 Page({
     data: {
         activityDetail: {},
-        collected: true,
     },
     onLoad(e) {
         // e.id位传入的活动id
         this.activityId = e.id
+        this.collected = true
         this.setData({
-            activityDetail: this.getActivityDetail()
+            activityDetail: this.getActivityDetail(),
+            collected: this.collected
         })
     },
     getActivityDetail: function () {
@@ -34,6 +36,12 @@ Page({
         WxParse.wxParse('article', 'html', that.activityDetail.content, that, 5);
         return that.activityDetail
     },
+    tapCollect: function() {
+        this.collected = !this.collected
+        this.setData({
+            collected: this.collected
+        })
+    },
     onClickTicketing(e) {
         // 看是否是多长次或需要支付
         // 不是，则直接弹出对话框确认购买
@@ -51,13 +59,13 @@ Page({
               });
         }
         else {
-
+            wx.navigateTo({
+                url: '/pages/buy-ticket/buy-ticket?id=' + this.activityId
+              })      
         }
     },
     buyTicket() {
         // TODO: request buy
-        wx.navigateTo({
-          url: '/pages/buy-ticket/buy-ticket?id=' + this.activityId
-        })
+        Toast.success('购买成功')
     }
 })
