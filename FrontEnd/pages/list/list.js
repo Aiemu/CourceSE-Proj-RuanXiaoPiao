@@ -83,7 +83,7 @@ Page({
                     activity_id: 2, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/starActivity/',
+                    url: 'http://62.234.50.47/starActivity/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -115,7 +115,7 @@ Page({
                     activity_id: 2, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/deleteStar/',
+                    url: 'http://62.234.50.47/deleteStar/',
                     data: postData,
                     method: 'POST',
                     header: {

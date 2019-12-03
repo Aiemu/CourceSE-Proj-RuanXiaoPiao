@@ -135,7 +135,7 @@ Page({
                     code: data.code,
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/getStarList/',
+                    url: 'http://62.234.50.47/getStarList/',
                     data: postData,
                     method: 'POST',
                     header: {
