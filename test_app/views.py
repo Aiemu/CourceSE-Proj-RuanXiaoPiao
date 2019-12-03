@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import hashlib
 import json
 import os
@@ -27,8 +29,6 @@ appsecret = '4acadab52b5a08cd3166d4743c39f3f8'
 @api_view(['POST'])
 
 # 尝试用global来将class DateEncoder置于全局，不幸失败
-
-# 建议：把appid和appsecret放到全局
 
 # from code to session
 def init(request):
@@ -92,9 +92,9 @@ def getActivityList(request):
         # update status
         current_time = datetime.datetime.now()
         if item.time <= current_time:
-            item.status = '已结束'
+            item.status = u'已结束'
         elif item.remain <= 0:
-            item.status = '已售空'
+            item.status = u'已售空'
         item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
         i = {
             'activity_id': item.activity_id, 
@@ -252,6 +252,7 @@ def getActivityInfo(request):
     } # 与之前的两个函数有不同。需要dumps吗？需要就加上class
     return JsonResponse(ret)
 
+# 已增加，现在会返回票的有效信息
 def getTicketInfo(request):
     # code & userinfo
     ticket_id = request.POST.get('ticket_id')
@@ -270,10 +271,12 @@ def getTicketInfo(request):
         'place': ticket.activity.place,
         'tic_time': ticket.purchaseTime,
         'act_time': ticket.activity.time,
+        'is_valid': ticket.is_valid,
         # 'QRCode': ticket.QRCode,
     } # 同理，需要dumps吗？
     return JsonResponse(ret)
 
+# 已修复，现在对于已经is_valid = False的票，不会重复退票
 def refundTicket(request):
     # code & userinfo
     js_code = request.POST.get('code')
@@ -296,23 +299,33 @@ def refundTicket(request):
     ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
     activity = ticket.activity
 
-    # activity changes
-    activity.remain += 1
-    activity.save()
+    # 判断ticket的is_valid，仅为True时才可退票
+    if ticket.is_valid:
+        # activity changes
+        activity.remain += 1
+        activity.save()
 
-    # ticket changes
-    ticket.is_valid = False # unvarify
-    ticket.save()
+        # ticket changes
+        ticket.is_valid = False # unvarify
+        ticket.save()
 
-    # user changes ?
+        # user changes ?
 
-    # ret msg
-    ret = {'code': '006', 'msg': None,'data':{}}
-    ret['msg'] = '退票成功'
-    ret['data'] = {
-        'ticket_id': ticket_id,
-        'unvarify': ticket.is_valid,
-    }
+        # ret msg
+        ret = {'code': '006', 'msg': None,'data':{}}
+        ret['msg'] = '退票成功'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+            'unvarify': ticket.is_valid,
+        }
+    else:
+        # ret msg
+        ret = {'code': '006', 'msg': None,'data':{}}
+        ret['msg'] = '退票失败'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+            'unvarify': ticket.is_valid,
+        }
     return JsonResponse(ret)
 
 def searchEngine(request):
@@ -453,13 +466,13 @@ def saveTestData(request):
 def index(request):
     return HttpResponse("Hello! You are at the index page of test_app.")
 
-# 仅测试用，可以删除，注意url也要对应删
-def changeData(request):
-    actList = Activity.objects.all()
-    for item in actList:
-        item.remain -= 1 #= item.remain + 1
-        item.save()
-    return HttpResponse("Hey! I have changed the datebase.")
+# # 仅测试用，可以删除，注意url也要对应删
+# def changeData(request):
+#     actList = Activity.objects.all()
+#     for item in actList:
+#         item.remain -= 1 #= item.remain + 1
+#         item.save()
+#     return HttpResponse("Hey! I have changed the datebase.")
 
 # # 同样仅测试用的显示图片函数
 # def showPicture(request):

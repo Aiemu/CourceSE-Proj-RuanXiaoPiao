@@ -87,6 +87,10 @@ DATABASES = {
         # 'USER': 'root',
         'HOST': 'localhost', 
         'PASSWORD': '123456',
+        'TEST': {
+            'CHARSET': 'utf8',
+            'COLLATION': 'utf8_general_ci',
+        }
     }
 }
 

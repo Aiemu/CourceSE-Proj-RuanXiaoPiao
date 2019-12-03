@@ -37,4 +37,4 @@ urlpatterns = [
     path('getStarList/', views.getStarList),
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
-]
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) # 导致url无法访问图片的原因在于少了这句
