@@ -1,6 +1,7 @@
 # CourceSE-Proj-RuanXiaoPiao
 ## 简介    
     <软小票>微信小程序是由五道口体校的四名学生合作（有待）完成的THU校内抢票工具
+    appid: wx7d93bbb34a8d3662
 
 ## 分支(Branch)说明
 	- master: 会议记录、参考资料、最终提交src、文档等
