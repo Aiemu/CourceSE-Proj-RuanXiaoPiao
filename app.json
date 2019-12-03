@@ -6,7 +6,9 @@
     "pages/ticket/ticket",
     "pages/my_order/my_order",
     "pages/my_collect/my_collect",
-    "pages/activity-details/activity-details"
+    "pages/activity-details/activity-details",
+    "pages/buy-ticket/buy-ticket",
+    "pages/search/search"
   ],
   "window": {
     "backgroundTextStyle": "light",

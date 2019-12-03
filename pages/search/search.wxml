@@ -1,0 +1,3 @@
+<view>
+    <van-search placeholder="活动名称" disabled bindtap=""></van-search>
+</view>

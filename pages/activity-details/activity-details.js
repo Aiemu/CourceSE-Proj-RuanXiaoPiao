@@ -1,10 +1,12 @@
 //富文本转换器
+import Dialog from '../../vant-weapp/dialog/dialog';
 let WxParse = require('../../wxParse/wxParse.js')
 
 
 Page({
     data: {
         activityDetail: {},
+        collected: true,
     },
     onLoad(e) {
         // e.id位传入的活动id
@@ -31,5 +33,31 @@ Page({
         }
         WxParse.wxParse('article', 'html', that.activityDetail.content, that, 5);
         return that.activityDetail
+    },
+    onClickTicketing(e) {
+        // 看是否是多长次或需要支付
+        // 不是，则直接弹出对话框确认购买
+        // 否饿，跳到选择支付页面
+        let temp = false
+        if (!temp) {
+            Dialog.confirm({
+                title: '确认抢票',
+                message: '确认要抢 ' + this.activityDetail.basicInfo.title + ' 的票吗?'
+              }).then(() => {
+                // on confirm
+                this.buyTicket()
+              }).catch(() => {
+                // on cancel
+              });
+        }
+        else {
+
+        }
+    },
+    buyTicket() {
+        // TODO: request buy
+        wx.navigateTo({
+          url: '/pages/buy-ticket/buy-ticket?id=' + this.activityId
+        })
     }
 })

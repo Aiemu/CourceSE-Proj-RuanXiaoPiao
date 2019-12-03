@@ -50,9 +50,7 @@
       margin-bottom: 30rpx;
   }
   .buttons{
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
+    margin: 30rpx;
   }
   .buy-button{
       margin: 55rpx;

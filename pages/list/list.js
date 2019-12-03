@@ -6,7 +6,6 @@ Page({
     },
     onLoad() {
         this.setData({
-            search: this.search.bind(this),
             banners: this.getBanners(),
             activityList: this.getActivityList()
         })
@@ -43,17 +42,15 @@ Page({
     ]
         return this.activityList
     },
-    search: function (value) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve([{text: '搜索结果', value: 1}, {text: '搜索结果2', value: 2}])
-            }, 200)
-        })
-    },
 
     toDetailsTap: function(e) {
         wx.navigateTo({
           url: '/pages/activity-details/activity-details?id=' + e.currentTarget.dataset.id
+        })
+    },
+    toSearchTap: function(e) {
+        wx.navigateTo({
+          url: '/pages/search/search'
         })
     },
 }

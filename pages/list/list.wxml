@@ -1,5 +1,5 @@
 <view>
-    <van-search placeholder="活动名称" value="{{search}}"></van-search>
+    <van-search placeholder="活动名称" disabled bindtap="toSearchTap"></van-search>
 </view>
 <view>
     <swiper indicator-dots="true" indicator-active-color="#fff" autoplay circular>
