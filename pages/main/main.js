@@ -1,21 +1,18 @@
-// pages/home/home.js
+// pages/main/main.js
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    is_verify: true,
+
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    //从后端抓取用户基本信息
-    this.setData({
-      
-    })
+
   },
 
   /**
@@ -65,36 +62,5 @@ Page({
    */
   onShareAppMessage: function () {
 
-  },
-
-  //自定义信号
-  myOrder: function(){
-    wx.navigateTo({
-      url: '../my_order/my_order',
-    })
-  },
-
-  myCollect: function(){
-    wx.navigateTo({
-      url: '../my_collect/my_collect',
-    })
-  },
-
-  myProfile: function(){
-    wx.navigateTo({
-      url: '../profile/profile',
-    })
-  },
-
-  verify: function() {
-    wx.navigateToMiniProgram({
-      "appId": "wx1ebe3b2266f4afe0", 
-      "path": "pages/index/index", 
-      "envVersion": "trial",
-      "extraData": { 
-        "origin": "miniapp",
-        "type": "id.tsinghua" 
-        }
-    })
   }
 })

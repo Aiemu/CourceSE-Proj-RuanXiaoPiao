@@ -1,14 +1,14 @@
 <!--pages/my_order/my_order.wxml-->
 <view class="header">活动列表</view>
-<view class="activity" bindtap="info">  
+<view wx:for="{{orderlist}}" wx:key="ticket_id" class="activity" bindtap="info" data-id="{{item.ticket_id}}">  
   <image class="post"></image>
   <view class="meta">
-    <text class="title">软件学院学生节</text>
-    <text class="date">2020.04.20</text>
-    <text class="location">大礼堂</text>
-    <text class="sponsor">软院学生会主办</text>
+    <text class="title">{{item.title}}</text>
+    <text class="date">{{item.time}}</text>
+    <text class="location">{{item.place}}</text>
+    <text class="price">{{item.price}}</text>
     <text class="state">未开始</text>
-    <button size="mini" class="refund" bindtap="refund">
+    <button size="mini" class="refund" catchtap="refund">
       <view class="t">退票</view>
     </button>
   </view>

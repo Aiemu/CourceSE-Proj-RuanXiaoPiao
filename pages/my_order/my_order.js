@@ -5,14 +5,45 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    //根据当前的时间去判断活动是否开始
+    orderlist:[]
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    var that = this
+    wx.login({
+      success: function (data) {
+        var postData = {
+          code: data.code,
+        };
+        wx.request({
+          url: 'http://62.234.50.47/getTicketList/',
+          data: postData,
+          method: 'POST',
+          header: {
+            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+          },
+          success: function (res) {
+            var list = res.data.data.ticketList
+            for (var i = 0; i < list.length; i++) {
+              list[i] = JSON.parse(list[i])
+            }
+            that.setData({
+              orderlist: list
+            })
+          },
+          fail: function (error) {
+            console.log(error);
+          }
+        })
+      },
+      fail: function () {
+        console('登录获取Code失败！');
+      }
+    })
   },
 
   /**
@@ -64,9 +95,14 @@ Page({
 
   },
 
-  info: function() {
+  info: function(e) {
+    var tmp = '../ticket/ticket?' + 'id=' + e.currentTarget.dataset.id
     wx.navigateTo({
-      url: '../ticket/ticket',
+      url: tmp,
     })
+  },
+
+  refund: function() {
+    
   }
 })

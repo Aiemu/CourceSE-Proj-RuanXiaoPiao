@@ -26,17 +26,32 @@
   justify-content: space-between;
 }
 .logo{
+  overflow: hidden;
+  display: block;
   width: 120rpx;
   height: 120rpx;
-  border-radius: 60rpx;
+  border-radius: 20%;
   margin-left: 40rpx;
   margin-right: 40rpx;
 }
-.tag{
-  padding-left: 20rpx;
-  width: 70%;
-  font-size: 30rpx;
+.tagT{
+  padding-left: 10rpx;
+  padding-right: 10rpx;
+  font-size: 25rpx;
   color: white;
   border-radius: 20rpx;
+  background-color: green;
+}
+.tagF{
+  padding-left: 10rpx;
+  padding-right: 10rpx;
+  font-size: 25rpx;
+  color: white;
+  border-radius: 20rpx;
+  background-color: gray;
+}
+
+.btn_verify{
+  margin-top: 20rpx;
   background-color: gray;
 }
