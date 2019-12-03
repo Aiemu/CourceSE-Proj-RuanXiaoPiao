@@ -33,6 +33,8 @@ urlpatterns = [
     path('searchEngine/', views.searchEngine), # 搜索
     path('saveTestData/', views.saveTestData), # 存入测试数据
     path('changeData/', views.changeData), # 
+    path('starActivity/', views,starActivity),
+    path('getStarList/', views.getStarList),
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
 ]

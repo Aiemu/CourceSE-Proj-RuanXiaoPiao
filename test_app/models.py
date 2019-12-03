@@ -20,6 +20,7 @@ class User(models.Model):
 
 class Activity(models.Model):
     activity_id = models.AutoField(primary_key = True)
+    starer = models.ForeignKey(User, on_delete=models.DO_NOTHING, default = '')
     title = models.CharField(max_length = 30)
     image = models.ImageField(upload_to = 'images', default = 'default/test_image.jpg') # TODO 图片的默认值与图片路径的关系有待确定
     status = models.CharField(max_length = 20, default = '正在抢票')

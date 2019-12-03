@@ -9,7 +9,7 @@ Page({
                     info: e.detail.rawData,
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/init/',
+                    url: 'http://62.234.50.47/init/',
                     data: postData,
                     method: 'POST',
                     header: {

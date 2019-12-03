@@ -373,6 +373,29 @@ def searchEngine(request):
     }
     return JsonResponse(ret)
 
+def starActivity(request):
+    # code & userinfo
+    js_code = request.POST.get('code')
+    ticket_id = request.POST.get('ticket_id')
+
+    # get openid
+    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
+    response = json.loads(requests.get(url).content)
+    
+    # if fail
+    if 'errcode' in response:
+        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+
+    # openid & session_key
+    openid = response['openid']
+    session_key = response['session_key']
+    
+    # get user & activity # 同理
+    user, created = User.objects.get_or_create(openid = openid)
+
+def getStarList(request):
+    pass
+
 # 初始化测试数据库
 def saveTestData(request):
     # test data for user
