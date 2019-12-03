@@ -1,26 +1,7 @@
 from django.db import models
 
-# Create your models here.
-
-class User(models.Model):
-    # basic info
-    user_id = models.AutoField(primary_key = True)
-    openid = models.CharField( max_length = 30)
-    username = models.CharField(max_length = 30)
-    password = models.CharField(max_length = 30)
-    student_id =  models.CharField(max_length = 10)
-
-    # varify info
-    # user_permissions = models.ManyToManyField() 
-    # is_verified = models.BooleanField() # 学号登录验证接口
-
-    # 指定表名,否则默认为test_app_User
-    class Meta:
-        db_table = 'User'
-
 class Activity(models.Model):
     activity_id = models.AutoField(primary_key = True)
-    starer = models.ForeignKey(User, on_delete=models.DO_NOTHING, default = '')
     title = models.CharField(max_length = 30)
     image = models.ImageField(upload_to = 'images', default = 'default/test_image.jpg') # TODO 图片的默认值与图片路径的关系有待确定
     status = models.CharField(max_length = 20, default = '正在抢票')
@@ -36,6 +17,23 @@ class Activity(models.Model):
     
     class Meta:
         db_table = 'Activity'
+
+class User(models.Model):
+    # basic info
+    user_id = models.AutoField(primary_key = True)
+    openid = models.CharField( max_length = 30)
+    username = models.CharField(max_length = 30)
+    password = models.CharField(max_length = 30)
+    student_id =  models.CharField(max_length = 10)
+    starred = models.ManyToManyField(Activity)
+
+    # varify info
+    # user_permissions = models.ManyToManyField() 
+    # is_verified = models.BooleanField() # 学号登录验证接口
+
+    # 指定表名,否则默认为test_app_User
+    class Meta:
+        db_table = 'User'
 
 class Ticket(models.Model):
     ticket_id = models.AutoField(primary_key = True)

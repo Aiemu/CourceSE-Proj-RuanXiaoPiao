@@ -344,6 +344,15 @@ def searchEngine(request):
     actList = Activity.objects.all()
     retList = {}
 
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = u'已结束'
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        item.save() 
+
     # search
     for word in wordList:
         for act in actList:
@@ -389,7 +398,7 @@ def searchEngine(request):
 def starActivity(request):
     # code & userinfo
     js_code = request.POST.get('code')
-    ticket_id = request.POST.get('ticket_id')
+    activity_id = request.POST.get('activity_id')
 
     # get openid
     url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
@@ -403,11 +412,121 @@ def starActivity(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user & activity # 同理
-    user, created = User.objects.get_or_create(openid = openid)
+    # get user & activity
+    user = User.objects.get(openid = openid)
+    activity = Activity.objects.get(activity_id = activity_id)
+
+    # star
+    user.starred.add(activity)
+    
+    # save
+    user.save()
+
+    # ret msg
+    ret = {'code': '008', 'msg': None,'data':{}}
+    ret['msg'] = '收藏成功'
+    ret['data'] = {
+        'user': user.username,
+        'activity': activity.activity_id,
+    }
+    return JsonResponse(ret)
 
 def getStarList(request):
-    pass
+    # code & userinfo
+    js_code = request.POST.get('code')
+    
+    # get openid
+    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
+    response = json.loads(requests.get(url).content)
+    
+    # if fail
+    if 'errcode' in response:
+        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+
+    # openid & session_key
+    openid = response['openid']
+    session_key = response['session_key']
+    
+    # get user & activity
+    user = User.objects.get(openid = openid)
+
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            # elif isinstance(obj, date):
+            #     return obj.strftime("%Y-%m-%d")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    actList = user.starred.all()
+    retList = []
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = u'已结束'
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            # 'image': item.image, # 结合活动信息应该在json里传出的设定，似乎image更多指的是图片在服务器中的路径？
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price
+        }
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '009', 'msg': None,'data':{}}
+    ret['msg'] = '收藏列表获取成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)
+
+def deleteStar(request):
+    # code & userinfo
+    js_code = request.POST.get('code')
+    activity_id = request.POST.get('activity_id')
+
+    # get openid
+    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
+    response = json.loads(requests.get(url).content)
+    
+    # if fail
+    if 'errcode' in response:
+        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+
+    # openid & session_key
+    openid = response['openid']
+    session_key = response['session_key']
+    
+    # get user & activity
+    user = User.objects.get(openid = openid)
+    activity = Activity.objects.get(activity_id = activity_id)
+
+    # delete
+    user.starred.remove(activity)
+
+    # save
+    user.save()
+
+    # ret msg
+    ret = {'code': '010', 'msg': None,'data':{}}
+    ret['msg'] = '取消收藏成功'
+    ret['data'] = {
+        'user': user.username,
+        'activity': activity.activity_id,
+    }
+    return JsonResponse(ret)
 
 # 初始化测试数据库
 def saveTestData(request):
@@ -454,7 +573,7 @@ def saveTestData(request):
     # ticket.save()
     
     # ret msg
-    ret = {'code': '008', 'msg': None,'data':{}}
+    ret = {'code': '011', 'msg': None,'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.username,

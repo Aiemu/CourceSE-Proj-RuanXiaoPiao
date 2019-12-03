@@ -32,9 +32,10 @@ urlpatterns = [
     path('refundTicket/', views.refundTicket), # 退票
     path('searchEngine/', views.searchEngine), # 搜索
     path('saveTestData/', views.saveTestData), # 存入测试数据
-    path('changeData/', views.changeData), # 
-    path('starActivity/', views,starActivity),
-    path('getStarList/', views.getStarList),
+    path('starActivity/', views.starActivity), # 收藏
+    path('deleteStar/', views.deleteStar), # 取消收藏
+    path('getStarList/', views.getStarList), # 获取收藏列表
+    # path('changeData/', views.changeData), # 
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) # 导致url无法访问图片的原因在于少了这句
