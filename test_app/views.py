@@ -220,7 +220,7 @@ def getTicketList(request):
             # 'owner': item.owner.username, 
             'ticket_status': item.is_valid,
             'activity_status': item.activity.status,
-            'activity_image': item.activity.image,
+            # 'activity_image': item.activity.image,
             # 'activity_id': item.activity.activity_id,
             'title': item.activity.title,
             'time': item.activity.time,
