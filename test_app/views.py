@@ -108,7 +108,7 @@ def getActivityList(request):
         i = {
             'activity_id': item.activity_id, 
             'title': item.title, 
-            # 'image': item.image, # 结合活动信息应该在json里传出的设定，似乎image更多指的是图片在服务器中的路径？
+            'image': 'http://62.234.50.47' + item.image.url,
             'status': item.status,
             'remain': item.remain,
             'publisher': item.publisher,
@@ -220,7 +220,7 @@ def getTicketList(request):
             # 'owner': item.owner.username, 
             'ticket_status': item.is_valid,
             'activity_status': item.activity.status,
-            # 'activity_image': item.activity.image,
+            'activity_image': 'http://62.234.50.47' + item.activity.image.url,
             # 'activity_id': item.activity.activity_id,
             'title': item.activity.title,
             'time': item.activity.time,
@@ -596,6 +596,17 @@ def saveTestData(request):
 
 def index(request):
     return HttpResponse("Hello! You are at the index page of test_app.")
+
+# def testImage(request):
+#     actList = Activity.objects.all()
+#     sample = actList[1]
+#     info = 'http://62.234.50.47' + sample.image.url
+#     # sample.image.name: default/test_image.jpg
+#     # sample.image.url: /media/default/test_image.jpg
+#     # sample.image.path: D:\GitLib\CourceSE-Proj-RuanXiaoPaio\media\default\test_image.jpg
+#     # return HttpResponse(sample.image.url)
+#     # print(type(sample.image.url))
+#     return HttpResponse(info)
 
 # # 仅测试用，可以删除，注意url也要对应删
 # def changeData(request):
