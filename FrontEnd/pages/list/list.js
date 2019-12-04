@@ -51,7 +51,7 @@ Page({
                     activity_id: 3, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/purchaseTicket/',
+                    url: 'http://127.0.0.1:8000/purchaseTicket/',
                     data: postData,
                     method: 'POST',
                     header: {

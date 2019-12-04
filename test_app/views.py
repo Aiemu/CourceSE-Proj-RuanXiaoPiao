@@ -146,8 +146,8 @@ def purchaseTicket(request):
     session_key = response['session_key']
     
     # get user & activity
-    user, created = User.objects.get_or_create(openid = openid) # TODO: Deal with get_or_create
-    activity, created = Activity.objects.get_or_create(activity_id = activity_id) # TODO: Deal with get_or_create
+    user = User.objects.get(openid = openid) # TODO: Deal with get_or_create
+    activity = Activity.objects.get(activity_id = activity_id) # TODO: Deal with get_or_create
 
     # is remain?
     if activity.remain <= 0:
@@ -160,17 +160,18 @@ def purchaseTicket(request):
         }
         return JsonResponse(ret)
     else:
-        try:
-            ticket = Ticket.objects.get(owner=user)
-            if ticket.activity == activity:
-                ret = {'code': '102', 'msg': None,'data':{}}
-                ret['msg'] = '购票失败，票已存在'
-                ret['data'] = {
-                    'user': user.username,
-                    'activity_id': activity_id,
-                    'remain': activity.remain,
-                }
-                return JsonResponse(ret)
+        try: 
+            ticket = Ticket.objects.filter(owner = user)
+            for i in ticket:
+                if i.activity == activity:
+                    ret = {'code': '102', 'msg': None,'data':{}}
+                    ret['msg'] = '购票失败，票已存在'
+                    ret['data'] = {
+                        'user': user.username,
+                        'activity_id': activity_id,
+                        'remain': activity.remain,
+                    }
+                    return JsonResponse(ret)
         except:
             # activity changes
             activity.remain -= 1 # decrease remain
