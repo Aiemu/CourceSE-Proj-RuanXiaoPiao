@@ -63,3 +63,5 @@ class HeatMode(models.Model):
     max_heat = models.FloatField(default = 1000)
     min_heat = models.FloatField(default = 0)
     
+    class Meta:
+        db_table = 'HeatMode'

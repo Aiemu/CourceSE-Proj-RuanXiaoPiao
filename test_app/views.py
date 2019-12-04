@@ -218,7 +218,8 @@ def getTicketList(request):
         i = {
             'ticket_id': item.ticket_id,
             # 'owner': item.owner.username, 
-            'status': item.is_valid,
+            'ticket_status': item.is_valid,
+            'activity_status': item.activity.status,
             # 'activity_id': item.activity.activity_id,
             'title': item.activity.title,
             'time': item.activity.time,
