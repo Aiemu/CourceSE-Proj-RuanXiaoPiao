@@ -36,7 +36,7 @@
     color:green;
   }
   .price{
-    margin-left: 10rpx;
+    margin-left: 30rpx;
   }
   .hot{
     color:red;

@@ -1,3 +1,24 @@
-<view>
-    <van-search placeholder="活动名称" disabled bindtap=""></van-search>
+<van-search
+  value="{{ value }}"
+  placeholder="请输入搜索关键词"
+  show-action
+  bind:change="onChange"
+  bind:search="onSearch"
+  bind:cancel="onCancel"
+/>
+<view class="tag">搜索结果: {{listLen}} 个</view>
+<view class="activity" wx:for="{{activityList}}" wx:for-item="activity" wx:key="id" data-id="{{activity.activity_id}}" bindtap="toDetailsTap">  
+    <image class="post" src="{{activity.image}}"></image>
+    <view class="meta">
+        <text class="title">{{activity.title}}</text>
+        <text class="date">{{activity.time}}</text>
+        <text class="location">{{activity.place}}</text>
+        <text class="sponsor">{{activity.publisher}}</text>
+        <view class="lastline">
+            <!--TODO: 添加状态内容 -->
+            <text class="state">{{activity.status}}</text>
+            <text wx:if="{{activity.price}}" class ="price">{{activity.price}}元</text>
+            <!-- <text class="hot">{{activity.hot}}</text> -->
+        </view>
+    </view>
 </view>

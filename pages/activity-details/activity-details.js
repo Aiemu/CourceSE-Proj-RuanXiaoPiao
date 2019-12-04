@@ -1,6 +1,6 @@
-//富文本转换器
 import Dialog from '../../vant-weapp/dialog/dialog'
 import Toast from '../../vant-weapp/toast/toast'
+//富文本转换器
 let WxParse = require('../../wxParse/wxParse.js')
 
 
@@ -11,46 +11,85 @@ Page({
     onLoad(e) {
         // e.id位传入的活动id
         this.activityId = e.id
-        this.collected = true
+        this.collected = false
         this.setData({
-            activityDetail: this.getActivityDetail(),
             collected: this.collected
         })
+        this.getActivityInfo()
     },
-    getActivityDetail: function () {
+
+    // 获取活动详情
+    getActivityInfo: function () {
         const that = this
-        // TODO: 改成服务器请求获取Detail
-        that.activityDetail = {
-            basicInfo: {
-                id: 0,
-                image: 'https://img.yzcdn.cn/vant/cat.jpeg',
-                title: '软件学院学生节',
-                date: '2020.04.20',
-                location: '大礼堂',
-                sponsor: '软院学生会主办',
-                state: 0,
-                hot: 500
+        var postData = {
+            activity_id: this.activityId,
+        };
+        wx.request({
+            url: 'http://62.234.50.47/getActivityInfo/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
             },
-            content: '<div>富文本商品详情，需要HTML或者Markdown格式</div>'
-        }
-        WxParse.wxParse('article', 'html', that.activityDetail.content, that, 5);
-        return that.activityDetail
+            success: function (res) {
+                console.log('getList-OK!');
+                console.log(res.data.data);
+                that.setData({
+                    activityDetail: {
+                        basicInfo: res.data.data
+                    }
+                })
+                // content 富文本解析并展示
+                // WxParse.wxParse('article', 'html', that.activityDetail.content, that, 5);
+
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
     },
+
     tapCollect: function() {
-        this.collected = !this.collected
-        this.setData({
-            collected: this.collected
+        let that = this
+        wx.login({
+            success: function (data) {
+                console.log('获取 Code：' + data.code)
+                var postData = {
+                    code: data.code,
+                    activity_id: that.activityId,
+                };
+                wx.request({
+                    url: 'http://62.234.50.47/deleteStar/',
+                    data: postData,
+                    method: 'POST',
+                    header: {
+                        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+                    },
+                    success: function (res) {
+                        //回调处理
+                        console.log('getOpenID-OK!');
+                        console.log(res.data);
+                    },
+                    fail: function (error) {
+                        console.log(error);
+                    }
+                })
+            },
+            fail: function () {
+                console('登录获取Code失败！');
+            }
         })
     },
     onClickTicketing(e) {
         // 看是否是多长次或需要支付
         // 不是，则直接弹出对话框确认购买
         // 否饿，跳到选择支付页面
+        console.log(this)
         let temp = false
         if (!temp) {
             Dialog.confirm({
                 title: '确认抢票',
-                message: '确认要抢 ' + this.activityDetail.basicInfo.title + ' 的票吗?'
+                message: '确认要抢 ' + this.data.activityDetail.basicInfo.title + ' 的票吗?'
               }).then(() => {
                 // on confirm
                 this.buyTicket()
@@ -65,7 +104,35 @@ Page({
         }
     },
     buyTicket() {
-        // TODO: request buy
-        Toast.success('购买成功')
+        let that = this
+        wx.login({
+            success: function (data) {
+                console.log('获取购买 Code：' + data.code)
+                var postData = {
+                    code: data.code,
+                    activity_id: that.activityId
+                }
+                wx.request({
+                    url: 'http://62.234.50.47/purchaseTicket/',
+                    data: postData,
+                    method: 'POST',
+                    header: {
+                        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+                    },
+                    success: function (res) {
+                        //回调处理
+                        console.log('getOpenID-OK!');
+                        console.log(res.data);
+                        Toast.success('购买成功')
+                    },
+                    fail: function (error) {
+                        console.log(error);
+                    }
+                })
+            },
+            fail: function () {
+                console('登录获取Code失败！');
+            }
+        })        
     }
 })
