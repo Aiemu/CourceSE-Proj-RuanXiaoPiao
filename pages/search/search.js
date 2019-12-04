@@ -44,6 +44,10 @@ Page({
     onCancel() {
 
     },
-  
+    toDetailsTap: function(e) {
+      wx.navigateTo({
+        url: '/pages/activity-details/activity-details?id=' + e.currentTarget.dataset.id
+      })
+    }
 });
   

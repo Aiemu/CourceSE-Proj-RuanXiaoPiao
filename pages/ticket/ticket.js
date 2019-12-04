@@ -5,6 +5,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    info: {},
     is_refund: true,
   },
 
@@ -12,7 +13,35 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    var that = this
+    wx.login({
+      success: function (data) {
+        var postData = {
+          code: data.code,
+          ticket_id: options.id
+        };
+        wx.request({
+          url: 'http://62.234.50.47/getTicketInfo/',
+          data: postData,
+          method: 'POST',
+          header: {
+            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+          },
+          success: function (res) {
+            //回调处理
+            that.setData({
+              info: res.data.data
+            })
+          },
+          fail: function (error) {
+            console.log(error);
+          }
+        })
+      },
+      fail: function () {
+        console('登录获取Code失败！');
+      }
+    })
   },
 
   /**

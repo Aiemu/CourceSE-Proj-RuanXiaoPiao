@@ -12,72 +12,59 @@ Page({
             banners: this.getBanners(),
         })
         this.getActivityList()
-        let that = this
-        // // 查看是否授权
-        // wx.getSetting({
-        //     success: function (res) {
-        //         console.log(res.authSetting)
-        //       if (res.authSetting['scope.userInfo']) {
-        //         wx.getUserInfo({
-        //           success: function (res) {
-        //             // 用户已经授权过,不需要显示授权页面,所以不需要改变 isHide 的值
-        //             // 根据自己的需求有其他操作再补充
-        //             // 我这里实现的是在用户授权成功后，调用微信的 wx.login 接口，从而获取code
-        //             wx.login({
-        //               success: res => {
-        //                 // 获取到用户的 code 之后：res.code
-        //                 console.log("用户的code:" + res.code)
-        //                   var postData = {
-        //                       code: res.code,
-        //                       // TODO： 传下面的
-        //                       info: e.detail.rawData,
-        //                   };
-        //                   wx.request({
-        //                       url: 'http://62.234.50.47/init/',
-        //                       data: postData,
-        //                       method: 'POST',
-        //                       header: {
-        //                           'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-        //                       },
-        //                       success: function (res) {
-        //                           //回调处理
-        //                           console.log('getOpenID-OK!');
-        //                           console.log(res.data);
-        //                       },
-        //                       fail: function (error) {
-        //                           console.log(error);
-        //                       }
-        //                   })
-        //               },
-        //               fail: function () {
-        //                   console('登录获取Code失败！');
-        //               }
-        //             }) // login
-        //           }
-        //         })
-        //       } else {
-        //         // 用户没有授权
-        //         that.setData({
-        //           ifNeedAuth: true
-        //         })
-        //       }
-        //     }
-
-        // })
+        this.authUser()
     },
-    onReady() {
-        if (this.ifNeedAuth) {
-            Dialog.confirm({
-                title: '软小票申请获取以下权限',
-                message: '获得你的公开信息(昵称，头像等)'
-              }).then(() => {
-                // on confirm
-                this.getUserInfo()
-              }).catch(() => {
-                // on cancel
-                console.log("取消")
-              })
-        }
+    authUser: function(e) {
+        let that = this
+        // 查看是否授权
+        wx.getSetting({
+            success: function (res) {
+              if (res.authSetting['scope.userInfo']) {
+                wx.getUserInfo({
+                  success: function (res) {
+                    let detail = res.rawData
+                    wx.login({
+                      success: res => {
+                        // 获取到用户的 code 之后：res.code
+                        console.log("用户的code:" + res.code)
+                        console.log("用户的Info:" + detail)
+                          var postData = {
+                              code: res.code,
+                              info: detail
+                          }
+                          console.log(postData)
+                          wx.request({
+                              url: 'http://62.234.50.47/init/',
+                              data: postData,
+                              method: 'POST',
+                              header: {
+                                  'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+                              },
+                              success: function (res) {
+                                  //回调处理
+                                  console.log('getOpenID-OK!');
+                                  console.log(res.data);
+                              },
+                              fail: function (error) {
+                                  console.log(error);
+                              }
+                          })
+                      },
+                      fail: function () {
+                          console('登录获取Code失败！');
+                      }
+                    }) // login
+                  }
+                })
+              } else {
+                // 用户没有授权
+                that.setData({
+                  ifNeedAuth: true
+                })
+              }
+            }
+
+        })
     },
     getUserInfo: function (e) {
         if (e.detail.userInfo) {

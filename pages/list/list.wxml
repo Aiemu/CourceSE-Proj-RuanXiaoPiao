@@ -1,8 +1,7 @@
 <van-dialog
   use-slot
-  title="标题"
+  title="需要授权，点击弹出窗口"
   show="{{ ifNeedAuth }}"
-  show-cancel-button
   confirm-button-open-type="getUserInfo"
   bind:close="onClose"
   bind:getuserinfo="getUserInfo"
@@ -32,7 +31,7 @@
                 <view class="lastline">
                   <!--TODO: 添加状态内容 -->
                   <text class="state">{{activity.status}}</text>
-                  <text wx:if="{{activity.price}}" class ="price">{{activity.price}}元</text>
+                  <text wx:if="{{activity.price}}" class ="">{{activity.price}}元</text>
                   <!-- <text class="hot">{{activity.hot}}</text> -->
                 </view>
             </view>

@@ -2,7 +2,6 @@
 
 .activity{
     display: flex;
-    justify-content: flex-start;
     border-top: 5rpx solid gray;
     padding-top: 20rpx;
     margin-bottom: 20rpx;
@@ -36,7 +35,7 @@
     color:green;
   }
   .price{
-    margin-left: 10rpx;
+    margin-left: 30rpx;
   }
   .hot{
     color:red;

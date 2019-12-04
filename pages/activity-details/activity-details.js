@@ -11,11 +11,8 @@ Page({
     onLoad(e) {
         // e.id位传入的活动id
         this.activityId = e.id
-        this.collected = false
-        this.setData({
-            collected: this.collected
-        })
         this.getActivityInfo()
+        this.getIfCollectThisAct()
     },
 
     // 获取活动详情
@@ -48,18 +45,67 @@ Page({
             }
         })
     },
-
+    getIfCollectThisAct: function() {
+        var that = this
+        wx.login({
+          success: function (data) {
+            var postData = {
+              code: data.code,
+            };
+            wx.request({
+              url: 'http://62.234.50.47/getStarList/',
+              data: postData,
+              method: 'POST',
+              header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+              },
+              success: function (res) {
+                var list = res.data.data.activityList
+                for (var i = 0; i < list.length; i++) {
+                  list[i] = JSON.parse(list[i])
+                }
+                let actID = that.activityId
+                for(let act in list) {
+                    act = list[act]
+                    if(act.activity_id == actID) {
+                        that.setData({
+                            collected: true
+                        })
+                        return
+                    }
+                }
+                that.setData({
+                    collected: false
+                })
+              },
+              fail: function (error) {
+                console.log(error);
+              }
+            })
+          },
+          fail: function () {
+            console('登录获取Code失败！');
+          }
+        })
+      },    
+    
     tapCollect: function() {
         let that = this
+        let ifCollected = that.data.collected
+        console.log("ifC:"+ifCollected)
         wx.login({
             success: function (data) {
                 console.log('获取 Code：' + data.code)
                 var postData = {
                     code: data.code,
                     activity_id: that.activityId,
-                };
+                }
+                let tmpUrl = 'http://62.234.50.47/starActivity/'
+                if(ifCollected) {
+                    tmpUrl = 'http://62.234.50.47/deleteStar/'
+                }
                 wx.request({
-                    url: 'http://62.234.50.47/deleteStar/',
+                    url: tmpUrl,
                     data: postData,
                     method: 'POST',
                     header: {
@@ -69,6 +115,11 @@ Page({
                         //回调处理
                         console.log('getOpenID-OK!');
                         console.log(res.data);
+                    
+                        that.setData({
+                            collected: !ifCollected
+                        })
+                        console.log(that.data.collected)
                     },
                     fail: function (error) {
                         console.log(error);
@@ -123,7 +174,12 @@ Page({
                         //回调处理
                         console.log('getOpenID-OK!');
                         console.log(res.data);
-                        Toast.success('购买成功')
+                        if(res.data.code == "002") {
+                            Toast.success('抢票成功!')
+                        }
+                        else {
+                            Toast.fail('票已存在!')
+                        }
                     },
                     fail: function (error) {
                         console.log(error);

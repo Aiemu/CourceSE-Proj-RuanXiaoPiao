@@ -1,7 +1,7 @@
 <import src="../../wxParse/wxParse.wxml" />
 <van-dialog id="van-dialog" />
 <van-toast id="van-toast" />
-<view class="activity">  
+<view class="activity">
     <image class="post" src="{{activityDetail.basicInfo.image}}"></image>
     <view class="meta">
         <text class="title">{{activityDetail.basicInfo.title}}</text>
@@ -9,7 +9,7 @@
             <!--TODO: 添加状态内容 -->
             <text class="state">{{activityDetail.basicInfo.status}}</text>
             <text wx:if="{{activityDetail.basicInfo.price}}" class="price">{{activityDetail.basicInfo.price}}元</text>
-            <text class="hot">{{activityDetail.basicInfo.hot}}</text>
+            <!-- <text class="hot">{{activityDetail.basicInfo.hot}}</text> -->
         </view>
     </view>
 </view>
