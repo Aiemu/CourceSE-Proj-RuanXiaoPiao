@@ -152,7 +152,7 @@ def purchaseTicket(request):
     # is remain?
     if activity.remain <= 0:
         ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '购票失败'
+        ret['msg'] = '购票失败，余票不足'
         ret['data'] = {
             'user': user.username,
             'activity_id': activity_id,
@@ -160,26 +160,36 @@ def purchaseTicket(request):
         }
         return JsonResponse(ret)
     else:
-        # activity changes
-        activity.remain -= 1 # decrease remain
-        activity.save()
+        try:
+            ticket = Ticket.objects.get(owner=user)
+            if ticket.activity == activity:
+                ret = {'code': '102', 'msg': None,'data':{}}
+                ret['msg'] = '购票失败，票已存在'
+                ret['data'] = {
+                    'user': user.username,
+                    'activity_id': activity_id,
+                    'remain': activity.remain,
+                }
+                return JsonResponse(ret)
+        except:
+            # activity changes
+            activity.remain -= 1 # decrease remain
+            activity.save()
 
-        # ticket changes
-        ticket = Ticket(owner = user, activity = activity) # new ticket
-        ticket.is_valid = True # varify
-        ticket.save()
+            # ticket changes
+            ticket = Ticket(owner = user, activity = activity) # new ticket
+            ticket.is_valid = True # varify
+            ticket.save()
 
-        # user changes ?
-
-        # ret msg
-        ret = {'code': '002', 'msg': None,'data':{}}
-        ret['msg'] = '购票成功'
-        ret['data'] = {
-            'user': user.username,
-            'activity_id': activity_id,
-            'remain': activity.remain,
-        }
-        return JsonResponse(ret)
+            # ret msg
+            ret = {'code': '002', 'msg': None,'data':{}}
+            ret['msg'] = '购票成功'
+            ret['data'] = {
+                'user': user.username,
+                'activity_id': activity_id,
+                'remain': activity.remain,
+            }
+            return JsonResponse(ret)
 
 def getTicketList(request):
     # 引用新class
