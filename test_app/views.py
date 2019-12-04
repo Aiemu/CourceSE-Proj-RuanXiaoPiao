@@ -253,7 +253,7 @@ def getActivityInfo(request):
     ret['data'] = {
         'activity_id': activity_id,
         'title': activity.title,
-        # 'image': activity.image,
+        'image': 'http://62.234.50.47' + activity.image.url,
         'status': activity.status,
         'remain': activity.remain,
         'publisher': activity.publisher,
