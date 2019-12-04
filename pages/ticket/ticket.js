@@ -32,7 +32,6 @@ Page({
             that.setData({
               info: res.data.data
             })
-            console.log(that.data.info)
           },
           fail: function (error) {
             console.log(error);
