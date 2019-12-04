@@ -48,7 +48,7 @@ Page({
                 console.log('获取购买 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    activity_id: 3, // TODO
+                    activity_id: 2, // TODO
                 };
                 wx.request({
                     url: 'http://62.234.50.47/purchaseTicket/',

@@ -173,24 +173,26 @@ def purchaseTicket(request):
                     }
                     return JsonResponse(ret)
         except:
-            # activity changes
-            activity.remain -= 1 # decrease remain
-            activity.save()
+            pass
 
-            # ticket changes
-            ticket = Ticket(owner = user, activity = activity) # new ticket
-            ticket.is_valid = True # varify
-            ticket.save()
+        # activity changes
+        activity.remain -= 1 # decrease remain
+        activity.save()
 
-            # ret msg
-            ret = {'code': '002', 'msg': None,'data':{}}
-            ret['msg'] = '购票成功'
-            ret['data'] = {
-                'user': user.username,
-                'activity_id': activity_id,
-                'remain': activity.remain,
-            }
-            return JsonResponse(ret)
+        # ticket changes
+        ticket = Ticket(owner = user, activity = activity) # new ticket
+        ticket.is_valid = True # varify
+        ticket.save()
+
+        # ret msg
+        ret = {'code': '002', 'msg': None,'data':{}}
+        ret['msg'] = '购票成功'
+        ret['data'] = {
+            'user': user.username,
+            'activity_id': activity_id,
+            'remain': activity.remain,
+        }
+        return JsonResponse(ret)
 
 def getTicketList(request):
     # 引用新class
