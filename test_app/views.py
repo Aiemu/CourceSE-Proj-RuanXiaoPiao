@@ -160,15 +160,18 @@ def purchaseTicket(request):
         }
         return JsonResponse(ret)
     else:
-        try: 
+        try:
             ticket = Ticket.objects.filter(owner = user)
+            # print(ticket)
             for i in ticket:
+                # print('owner:', i.owner.user_id, 'act:', i.activity.activity_id)
                 if i.activity == activity:
                     ret = {'code': '102', 'msg': None,'data':{}}
                     ret['msg'] = '购票失败，票已存在'
                     ret['data'] = {
+                        'user_id': user.user_id,
                         'user': user.username,
-                        'activity_id': activity_id,
+                        'activity_id': activity.activity_id,
                         'remain': activity.remain,
                     }
                     return JsonResponse(ret)
@@ -183,13 +186,14 @@ def purchaseTicket(request):
         ticket = Ticket(owner = user, activity = activity) # new ticket
         ticket.is_valid = True # varify
         ticket.save()
-
+        
         # ret msg
         ret = {'code': '002', 'msg': None,'data':{}}
         ret['msg'] = '购票成功'
         ret['data'] = {
+            'user_id': user.user_id,
             'user': user.username,
-            'activity_id': activity_id,
+            'activity_id': activity.activity_id,
             'remain': activity.remain,
         }
         return JsonResponse(ret)
