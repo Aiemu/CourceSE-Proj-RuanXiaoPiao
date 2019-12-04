@@ -166,6 +166,7 @@ def purchaseTicket(request):
                 ret = {'code': '102', 'msg': None,'data':{}}
                 ret['msg'] = '购票失败，票已存在'
                 ret['data'] = {
+                    'user_id': user.user_id,
                     'user': user.username,
                     'activity_id': activity_id,
                     'remain': activity.remain,
@@ -185,6 +186,7 @@ def purchaseTicket(request):
             ret = {'code': '002', 'msg': None,'data':{}}
             ret['msg'] = '购票成功'
             ret['data'] = {
+                'user_id': user.user_id,
                 'user': user.username,
                 'activity_id': activity_id,
                 'remain': activity.remain,
