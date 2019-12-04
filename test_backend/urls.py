@@ -35,7 +35,9 @@ urlpatterns = [
     path('starActivity/', views.starActivity), # 收藏
     path('deleteStar/', views.deleteStar), # 取消收藏
     path('getStarList/', views.getStarList), # 获取收藏列表
+
+    # path('globalTest/',views.globalTest), # 全局变量测试
     # path('changeData/', views.changeData), # 
     # path('showPicture/', views.showPicture),
     # path('getPath/', views.getPath),
-] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) # 导致url无法访问图片的原因在于少了这句
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

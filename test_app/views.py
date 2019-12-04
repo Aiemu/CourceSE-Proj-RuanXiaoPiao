@@ -12,6 +12,7 @@ import datetime
 import jieba
 import re
 
+# from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
@@ -29,6 +30,14 @@ appsecret = '4acadab52b5a08cd3166d4743c39f3f8'
 @api_view(['POST'])
 
 # 尝试用global来将class DateEncoder置于全局，不幸失败
+
+# def globalSetting(request):
+#     return {
+#         'GLOBAL_TEST': settings.GLOBAL_TEST,
+#     }
+
+# def globalTest(request):
+#     return HttpResponse('GLOBAL_TEST')
 
 # from code to session
 def init(request):
@@ -208,8 +217,9 @@ def getTicketList(request):
     for item in ticList:
         i = {
             'ticket_id': item.ticket_id,
-            'owner': item.owner.username, 
-            'activity_id': item.activity.activity_id,
+            # 'owner': item.owner.username, 
+            'status': item.is_valid,
+            # 'activity_id': item.activity.activity_id,
             'title': item.activity.title,
             'time': item.activity.time,
             'place': item.activity.place,

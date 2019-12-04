@@ -67,6 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # 注册全局变量
+                # 'test_app.views.globalSetting',
             ],
 
         },
@@ -136,3 +138,5 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# GLOBAL_TEST = '测试用全局变量'
