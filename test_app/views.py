@@ -503,7 +503,7 @@ def getStarList(request):
         i = {
             'activity_id': item.activity_id, 
             'title': item.title, 
-            # 'image': item.image, # 结合活动信息应该在json里传出的设定，似乎image更多指的是图片在服务器中的路径？
+            'image': 'http://62.234.50.47' + item.image.url,
             'status': item.status,
             'remain': item.remain,
             'publisher': item.publisher,
@@ -576,10 +576,6 @@ def saveTestData(request):
 
     # test data for acvivity
     activity1, created = Activity.objects.get_or_create(title = 'testActivity 1')
-
-    # #  图片文件读取测试
-    # file_content = ContentFile(request.FILES['img'].read())
-    # activity1.image = ImageStore(name = request.FILES['img'].name, img = request.FILES['img'])
 
     activity1.remain = 100
     activity1.time = '2019-12-30 12:30:00'
