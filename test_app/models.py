@@ -8,13 +8,18 @@ class Activity(models.Model):
     status = models.CharField(max_length = 20, default = '正在抢票')
     remain = models.IntegerField(default = 100)
     publisher = models.CharField(max_length = 30, default = 'unknown publisher')
-    
-    heat = models.FloatField(default = 0.0) # TO BE DEFINED
     description = models.CharField(max_length = 1024, default = '哎呀，这个活动的介绍文字似乎走丢了...')
     time = models.DateTimeField(default = datetime.now)
     place = models.CharField(max_length = 30, default = 'none place')
     price = models.FloatField(default = 0.0)
-    # keywords = models.() # 搜索 分词 关键词
+
+    heat = models.FloatField(default = 50.0) # 活动热度
+    scan_change = models.FloatField(default = 0.02) # 浏览时增加的热度
+    star_change = models.FloatField(default = 0.5) # 关注/取关时的热度变化
+    purchase_change = models.FloatField(default = 2.0) # 购买/退票时的热度变化
+    # arrive_change = models.FloatField(default = 2.5) # 到场时的热度变化
+    # max_heat = models.FloatField(default = 1000)
+    min_heat = models.FloatField(default = 0) # 活动过期后置为最低热度
     
     class Meta:
         db_table = 'Activity'
@@ -48,20 +53,3 @@ class Ticket(models.Model):
 
     class Meta:
         db_table = 'Ticket'
-
-class HeatMode(models.Model):
-    mode_id = models.AutoField(primary_key = True)
-    # mode_class = models.CharField(max_length = 20, default = '新增类型')
-    origin = models.FloatField(default = 50.0)
-    scan_change = models.FloatField(default = 0.2)
-    star_change = models.FloatField(default = 0.5)
-    unstar_change = models.FloatField(default = -0.5)
-    buy_change = models.FloatField(default = 2.0)
-    refund_change = models.FloatField(default = -2.0)
-    arrive_change = models.FloatField(default = 2.5)
-    over_change = models.FloatField(default = -100)
-    max_heat = models.FloatField(default = 1000)
-    min_heat = models.FloatField(default = 0)
-    
-    class Meta:
-        db_table = 'HeatMode'

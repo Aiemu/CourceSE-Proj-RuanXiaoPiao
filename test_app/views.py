@@ -29,16 +29,6 @@ appsecret = '4acadab52b5a08cd3166d4743c39f3f8'
 
 @api_view(['POST'])
 
-# 尝试用global来将class DateEncoder置于全局，不幸失败
-
-# def globalSetting(request):
-#     return {
-#         'GLOBAL_TEST': settings.GLOBAL_TEST,
-#     }
-
-# def globalTest(request):
-#     return HttpResponse('GLOBAL_TEST')
-
 # from code to session
 def init(request):
     # code & userinfo
@@ -58,7 +48,7 @@ def init(request):
     session_key = response['session_key']
 
     # save openid in database and make sure whether it is existing
-    user, created = User.objects.get_or_create(openid=openid)
+    user = User.objects.get(openid=openid)
 
     # complete user info
     user.username = json.loads(user_info)['nickName']
@@ -102,6 +92,7 @@ def getActivityList(request):
         current_time = datetime.datetime.now()
         if item.time <= current_time:
             item.status = u'已结束'
+            item.heat = item.min_heat
         elif item.remain <= 0:
             item.status = u'已售空'
         item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
@@ -115,7 +106,8 @@ def getActivityList(request):
             'description': item.description,
             'time': item.time,
             'place': item.place, 
-            'price': item.price
+            'price': item.price,
+            'heat': item.heat,
         }
         iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
         retList.append(iJson)
@@ -146,8 +138,8 @@ def purchaseTicket(request):
     session_key = response['session_key']
     
     # get user & activity
-    user = User.objects.get(openid = openid) # TODO: Deal with get_or_create
-    activity = Activity.objects.get(activity_id = activity_id) # TODO: Deal with get_or_create
+    user = User.objects.get(openid = openid)
+    activity = Activity.objects.get(activity_id = activity_id)
 
     # is remain?
     if activity.remain <= 0:
@@ -180,6 +172,7 @@ def purchaseTicket(request):
 
         # activity changes
         activity.remain -= 1 # decrease remain
+        activity.heat += activity.purchase_change
         activity.save()
 
         # ticket changes
@@ -223,7 +216,7 @@ def getTicketList(request):
     session_key = response['session_key']
     
     # get user
-    user, created = User.objects.get_or_create(openid = openid)
+    user = User.objects.get(openid = openid)
 
     # get user's tickets
     ticList = user.ticket_set.all()
@@ -243,7 +236,7 @@ def getTicketList(request):
             'time': item.activity.time,
             'place': item.activity.place,
             'price': item.activity.price,
-
+            'heat': item.activity.heat,
         }
         iJson = json.dumps(i, cls = DateEncoder)
         retList.append(iJson)
@@ -261,9 +254,11 @@ def getActivityInfo(request):
     # code & userinfo
     activity_id = request.POST.get('activity_id')
 
-    # get user & activity # 同理
-    activity, created = Activity.objects.get_or_create(activity_id = activity_id)
-
+    # get user & activity
+    activity = Activity.objects.get(activity_id = activity_id)
+    # 浏览活动详情，改变活动热度
+    activity.heat += activity.scan_change
+    activity.save()
     # ret msg
     ret = {'code': '004', 'msg': None,'data':{}}
     ret['msg'] = '活动详情获取成功'
@@ -278,16 +273,16 @@ def getActivityInfo(request):
         'time': activity.time,
         'place': activity.place,
         'price': activity.price,
-    } # 与之前的两个函数有不同。需要dumps吗？需要就加上class
+        'heat': activity.heat,
+    }
     return JsonResponse(ret)
 
-# 已增加，现在会返回票的有效信息
 def getTicketInfo(request):
     # code & userinfo
     ticket_id = request.POST.get('ticket_id')
 
     # get user & activity # 同理
-    ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
+    ticket = Ticket.objects.get(ticket_id = ticket_id)
 
     # ret msg
     ret = {'code': '005', 'msg': None,'data':{}}
@@ -298,6 +293,7 @@ def getTicketInfo(request):
         'title': ticket.activity.title,
         'price': ticket.activity.price,
         'place': ticket.activity.place,
+        'heat': ticket.activity.heat,
         'tic_time': ticket.purchaseTime,
         'act_time': ticket.activity.time,
         'is_valid': ticket.is_valid,
@@ -323,15 +319,16 @@ def refundTicket(request):
     openid = response['openid']
     session_key = response['session_key']
     
-    # get user & activity # 同理
-    user, created = User.objects.get_or_create(openid = openid)
-    ticket, created = Ticket.objects.get_or_create(ticket_id = ticket_id)
+    # get user & activity
+    user = User.objects.get(openid = openid)
+    ticket = Ticket.objects.get(ticket_id = ticket_id)
     activity = ticket.activity
 
     # 判断ticket的is_valid，仅为True时才可退票
     if ticket.is_valid:
         # activity changes
         activity.remain += 1
+        activity.heat -= activity.purchase_change
         activity.save()
 
         # ticket changes
@@ -378,6 +375,7 @@ def searchEngine(request):
         current_time = datetime.datetime.now()
         if item.time <= current_time:
             item.status = u'已结束'
+            item.heat = item.min_heat
         elif item.remain <= 0:
             item.status = u'已售空'
         item.save() 
@@ -404,14 +402,15 @@ def searchEngine(request):
         i = {
                 'activity_id': item.activity_id, 
                 'title': item.title, 
-                # 'image': item.image, # 结合活动信息应该在json里传出的设定，似乎image更多指的是图片在服务器中的路径？
+                'image': 'http://62.234.50.47' + item.image.url,
                 'status': item.status,
                 'remain': item.remain,
                 'publisher': item.publisher,
                 'description': item.description,
                 'time': item.time,
                 'place': item.place, 
-                'price': item.price
+                'price': item.price,
+                'heat': item.heat,
             }
         iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
         retactList.append(iJson)
@@ -447,9 +446,11 @@ def starActivity(request):
 
     # star
     user.starred.add(activity)
+    activity.heat += activity.star_change
     
     # save
     user.save()
+    activity.save()
 
     # ret msg
     ret = {'code': '008', 'msg': None,'data':{}}
@@ -495,6 +496,7 @@ def getStarList(request):
         current_time = datetime.datetime.now()
         if item.time <= current_time:
             item.status = u'已结束'
+            item.heat = item.min_heat
         elif item.remain <= 0:
             item.status = u'已售空'
         item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
@@ -544,9 +546,11 @@ def deleteStar(request):
 
     # delete
     user.starred.remove(activity)
+    activity.heat -= activity.star_change
 
     # save
     user.save()
+    activity.save()
 
     # ret msg
     ret = {'code': '010', 'msg': None,'data':{}}
@@ -613,49 +617,3 @@ def saveTestData(request):
 
 def index(request):
     return HttpResponse("Hello! You are at the index page of test_app.")
-
-# def testImage(request):
-#     actList = Activity.objects.all()
-#     sample = actList[1]
-#     info = 'http://62.234.50.47' + sample.image.url
-#     # sample.image.name: default/test_image.jpg
-#     # sample.image.url: /media/default/test_image.jpg
-#     # sample.image.path: D:\GitLib\CourceSE-Proj-RuanXiaoPaio\media\default\test_image.jpg
-#     # return HttpResponse(sample.image.url)
-#     # print(type(sample.image.url))
-#     return HttpResponse(info)
-
-# # 仅测试用，可以删除，注意url也要对应删
-# def changeData(request):
-#     actList = Activity.objects.all()
-#     for item in actList:
-#         item.remain -= 1 #= item.remain + 1
-#         item.save()
-#     return HttpResponse("Hey! I have changed the datebase.")
-
-# # 同样仅测试用的显示图片函数
-# def showPicture(request):
-#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#     image_path = os.path.join(base_dir, request.GET['path'])
-#     image_data = open(image_path, 'rb').read()
-#     return HttpResponse(image_data, content_type = 'image/jpg')
-
-# # 这是将图片路径传递给前端的测试函数。。。。
-# def getPath(request):
-#     # # ret msg
-#     # ret = {'code': '007', 'msg': None,'data':{}}
-#     # ret['msg'] = '获得图片路径'
-#     # ret['data'] = {
-#     #     'ticket_id': ticket_id,
-#     #     'unvarify': ticket.is_valid,
-#     # }
-#     # return JsonResponse(ret)
-    
-#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#     activity, created = Activity.objects.get_or_create(activity_id = 1)
-#     image_path = os.path.join(base_dir, activity.image)
-#     image_data = open(image_path, 'rb').read()
-#     return HttpResponse(image_data, content_type = 'image/jpg')
-
-    
-#     # showPicture/?path=media/default/test_image.jpg
