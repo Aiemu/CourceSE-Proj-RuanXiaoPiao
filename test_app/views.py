@@ -48,7 +48,7 @@ def init(request):
     session_key = response['session_key']
 
     # save openid in database and make sure whether it is existing
-    user = User.objects.get(openid=openid)
+    user, create = User.objects.get_or_create(openid=openid)
 
     # complete user info
     user.username = json.loads(user_info)['nickName']
@@ -138,8 +138,18 @@ def purchaseTicket(request):
     session_key = response['session_key']
     
     # get user & activity
-    user = User.objects.get(openid = openid)
-    activity = Activity.objects.get(activity_id = activity_id)
+    try: 
+        user = User.objects.get(openid = openid)
+        activity = Activity.objects.get(activity_id = activity_id)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '购票失败，用户或活动不存在'
+        ret['data'] = {
+            'code': js_code,
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
 
     # is remain?
     if activity.remain <= 0:
@@ -216,7 +226,16 @@ def getTicketList(request):
     session_key = response['session_key']
     
     # get user
-    user = User.objects.get(openid = openid)
+    try: 
+        user = User.objects.get(openid = openid)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '获取已购票列表失败，用户不存在'
+        ret['data'] = {
+            'code': js_code,
+            'openid': openid,
+        }
+        return JsonResponse(ret)
 
     # get user's tickets
     ticList = user.ticket_set.all()
@@ -255,10 +274,20 @@ def getActivityInfo(request):
     activity_id = request.POST.get('activity_id')
 
     # get user & activity
-    activity = Activity.objects.get(activity_id = activity_id)
+    try: 
+        activity = Activity.objects.get(activity_id = activity_id)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '获取活动详情失败，该活动不存在'
+        ret['data'] = {
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
     # 浏览活动详情，改变活动热度
     activity.heat += activity.scan_change
     activity.save()
+
     # ret msg
     ret = {'code': '004', 'msg': None,'data':{}}
     ret['msg'] = '活动详情获取成功'
@@ -281,8 +310,16 @@ def getTicketInfo(request):
     # code & userinfo
     ticket_id = request.POST.get('ticket_id')
 
-    # get user & activity # 同理
-    ticket = Ticket.objects.get(ticket_id = ticket_id)
+    # get user & activity
+    try:
+        ticket = Ticket.objects.get(ticket_id = ticket_id)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '获取票详情失败，票不存在'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
 
     # ret msg
     ret = {'code': '005', 'msg': None,'data':{}}
@@ -298,7 +335,7 @@ def getTicketInfo(request):
         'act_time': ticket.activity.time,
         'is_valid': ticket.is_valid,
         # 'QRCode': ticket.QRCode,
-    } # 同理，需要dumps吗？
+    }
     return JsonResponse(ret)
 
 # 已修复，现在对于已经is_valid = False的票，不会重复退票
@@ -320,9 +357,19 @@ def refundTicket(request):
     session_key = response['session_key']
     
     # get user & activity
-    user = User.objects.get(openid = openid)
-    ticket = Ticket.objects.get(ticket_id = ticket_id)
-    activity = ticket.activity
+    try: 
+        user = User.objects.get(openid = openid)
+        ticket = Ticket.objects.get(ticket_id = ticket_id)
+        activity = ticket.activity
+    except: 
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '退票失败，用户或此票不存在'
+        ret['data'] = {
+            'code': js_code,
+            'openid': openid,
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
 
     # 判断ticket的is_valid，仅为True时才可退票
     if ticket.is_valid:
@@ -441,8 +488,18 @@ def starActivity(request):
     session_key = response['session_key']
     
     # get user & activity
-    user = User.objects.get(openid = openid)
-    activity = Activity.objects.get(activity_id = activity_id)
+    try: 
+        user = User.objects.get(openid = openid)
+        activity = Activity.objects.get(activity_id = activity_id)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '收藏失败，用户或活动不存在'
+        ret['data'] = {
+            'code': js_code,
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
 
     # star
     user.starred.add(activity)
@@ -478,7 +535,16 @@ def getStarList(request):
     session_key = response['session_key']
     
     # get user & activity
-    user = User.objects.get(openid = openid)
+    try: 
+        user = User.objects.get(openid = openid)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '获取收藏列表失败，该用户不存在'
+        ret['data'] = {
+            'code': js_code,
+            'openid': openid,
+        }
+        return JsonResponse(ret)
 
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -541,8 +607,18 @@ def deleteStar(request):
     session_key = response['session_key']
     
     # get user & activity
-    user = User.objects.get(openid = openid)
-    activity = Activity.objects.get(activity_id = activity_id)
+    try: 
+        user = User.objects.get(openid = openid)
+        activity = Activity.objects.get(activity_id = activity_id)
+    except: 
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '取消收藏失败，该用户或活动不存在'
+        ret['data'] = {
+            'code': js_code,
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
 
     # delete
     user.starred.remove(activity)

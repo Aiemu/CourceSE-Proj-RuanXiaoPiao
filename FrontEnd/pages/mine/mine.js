@@ -9,7 +9,7 @@ Page({
                     info: e.detail.rawData,
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/init/',
+                    url: 'http://127.0.0.1:8000/init/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -40,7 +40,7 @@ Page({
                     code: data.code,
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/getTicketList/',
+                    url: 'http://127.0.0.1:8000/getTicketList/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -69,10 +69,10 @@ Page({
                 console.log('获取登录 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    ticket_id: 1, // TODO
+                    ticket_id: 11, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/getTicketInfo/',
+                    url: 'http://127.0.0.1:8000/getTicketInfo/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -101,10 +101,10 @@ Page({
                 console.log('获取登录 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    ticket_id: 1, // TODO
+                    ticket_id: 11, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/refundTicket/',
+                    url: 'http://127.0.0.1:8000/refundTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -135,7 +135,7 @@ Page({
                     code: data.code,
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/getStarList/',
+                    url: 'http://127.0.0.1:8000/getStarList/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -162,7 +162,7 @@ Page({
             str: 'save test data'
         };
         wx.request({
-            url: 'http://62.234.50.47/saveTestData/',
+            url: 'http://127.0.0.1:8000/saveTestData/',
             data: postData,
             method: 'POST',
             header: {
