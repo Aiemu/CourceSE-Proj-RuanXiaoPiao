@@ -48,7 +48,7 @@ def init(request):
     session_key = response['session_key']
 
     # save openid in database and make sure whether it is existing
-    user = User.objects.get(openid=openid)
+    user = User.objects.get_or_create(openid=openid)
 
     # complete user info
     user.username = json.loads(user_info)['nickName']
