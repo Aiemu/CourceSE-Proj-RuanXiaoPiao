@@ -4,7 +4,7 @@ Page({
             str: 'get list'
         };
         wx.request({
-            url: 'http://62.234.50.47/getActivityList/',
+            url: 'http://127.0.0.1:8000/getActivityList/',
             data: postData,
             method: 'POST',
             header: {
@@ -22,10 +22,10 @@ Page({
 
     getActivityInfo: function () {
         var postData = {
-            activity_id: 1,
+            activity_id: 2,
         };
         wx.request({
-            url: 'http://62.234.50.47/getActivityInfo/',
+            url: 'http://127.0.0.1:8000/getActivityInfo/',
             data: postData,
             method: 'POST',
             header: {
@@ -48,10 +48,10 @@ Page({
                 console.log('获取购买 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    activity_id: 2, // TODO
+                    activity_id: 4, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/purchaseTicket/',
+                    url: 'http://127.0.0.1:8000/purchaseTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -80,10 +80,10 @@ Page({
                 console.log('获取 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    activity_id: 2, // TODO
+                    activity_id: 1, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/starActivity/',
+                    url: 'http://127.0.0.1:8000/starActivity/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -112,10 +112,10 @@ Page({
                 console.log('获取 Code：' + data.code)
                 var postData = {
                     code: data.code,
-                    activity_id: 2, // TODO
+                    activity_id: 1, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/deleteStar/',
+                    url: 'http://127.0.0.1:8000/deleteStar/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -142,7 +142,7 @@ Page({
             line: '大礼堂项目部'
         };
         wx.request({
-            url: 'http://62.234.50.47/searchEngine/',
+            url: 'http://127.0.0.1:8000/searchEngine/',
             data: postData,
             method: 'POST',
             header: {
