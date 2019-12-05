@@ -31,6 +31,7 @@ Page({
             success: function (res) {
                 console.log('getList-OK!');
                 console.log(res.data.data);
+                res.data.data.heat = Math.ceil(res.data.data.heat)
                 that.setData({
                     activityDetail: {
                         basicInfo: res.data.data

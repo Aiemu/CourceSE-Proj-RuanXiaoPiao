@@ -9,7 +9,7 @@
             <!--TODO: 添加状态内容 -->
             <text class="state">{{activityDetail.basicInfo.status}}</text>
             <text wx:if="{{activityDetail.basicInfo.price}}" class="price">{{activityDetail.basicInfo.price}}元</text>
-            <!-- <text class="hot">{{activityDetail.basicInfo.hot}}</text> -->
+            <text class="hot">{{activityDetail.basicInfo.heat}}</text>
         </view>
     </view>
 </view>

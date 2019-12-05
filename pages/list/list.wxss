@@ -29,7 +29,6 @@
   }
   .lastline{
     font-size: 35rpx;
-    display: flex;
     margin-top: auto;
   }
   .state{
@@ -40,5 +39,7 @@
   }
   .hot{
     color:red;
-    margin-left: 200rpx;
+    float: right;
+    position: absolute;
+    right: 0rpx;
   }

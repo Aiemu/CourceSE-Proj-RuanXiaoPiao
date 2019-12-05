@@ -39,7 +39,7 @@
   }
   .hot{
     color:red;
-    margin-left: 200rpx;
+    margin-left: 100rpx;
   }
   .activity-detail{
       margin-top: 50rpx;

@@ -137,6 +137,7 @@ Page({
                 list = res.data.data.activityList
                 for (let i = 0; i < list.length; i++) {
                     list[i] = JSON.parse(list[i])
+                    list[i].heat = Math.ceil(list[i].heat)
                 }
                 that.setData({
                     activityList: list
