@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 添加计时器  warning: 必须在APP之前
-    'django_crontab',
+    # 'django_crontab',
     # 添加APP
     'test_app',
 ]
@@ -68,8 +68,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 注册全局变量
-                # 'test_app.views.globalSetting',
             ],
 
         },
@@ -138,18 +136,14 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 
-# SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-
-# GLOBAL_TEST = '测试用全局变量'
-
-# 配置计时器
-CRONJOBS = [
-    ('* * /1 * *', 'test_app.cron.heatDecrease')
-    # 每一分钟触发一次，追加写入日志文件：,'>>/home/python/test_crontab.log'，覆盖写入：>
-    # * 所有的取值范围的数字
-    # / 每
-    # - 从...到...
-    # , 分开若干个离散的数字
-    # 一共五位数：分，时，日，月，年
-    # python manage.py crontab add/show/remove
-]
+# # 配置计时器
+# CRONJOBS = [
+#     ('* * /1 * *', 'test_app.cron.heatDecrease')
+#     # 每一分钟触发一次，追加写入日志文件：,'>>/home/python/test_crontab.log'，覆盖写入：>
+#     # * 所有的取值范围的数字
+#     # / 每
+#     # - 从...到...
+#     # , 分开若干个离散的数字
+#     # 一共五位数：分，时，日，月，年
+#     # python manage.py crontab add/show/remove
+# ]

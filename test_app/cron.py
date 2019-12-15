@@ -1,8 +1,8 @@
-from .models import User, Activity, Ticket
+# from .models import User, Activity, Ticket
 
-dailydecrease = 1.0
+# dailydecrease = 1.0
 
-def heatDecrease():
-    actList = Activity.objects.all()
-    for item in actList:
-        item.heat -= dailydecrease
+# def heatDecrease():
+#     actList = Activity.objects.all()
+#     for item in actList:
+#         item.heat -= dailydecrease
