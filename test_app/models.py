@@ -48,7 +48,7 @@ class Ticket(models.Model):
     is_valid = models.BooleanField(default=False) # 仅表示是否退票
     purchaseTime = models.DateTimeField('购票日期', auto_now_add = True) # PS:auto_now_add使之为readonly。若需修改puchaseTime，则此处应改用default = timezone.now
                                                                     # WARMNING:修改含auto_now或auto_now_add的字段时，需先改为default = 'xxxx-xx-xx xx:xx:xx'并完成一次迁移
-    # QRCode = models.ImageField() # TODO
+    QRCode = models.ImageField(upload_to = 'QR', default = 'QR/default.png')
     # is_checked = models.BooleanField()
 
     class Meta:
