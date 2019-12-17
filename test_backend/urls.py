@@ -45,7 +45,7 @@ urlpatterns = [
     # star
     path('starActivity/', views.starActivity), # 收藏
     path('deleteStar/', views.deleteStar), # 取消收藏
-    path('getStarList/', views.deleteStar), # 获取收藏列表
+    path('getStarList/', views.getStarList), # 获取收藏列表
 
     # save test data
     path('saveTestData/', views.saveTestData), # 存入测试数据 
