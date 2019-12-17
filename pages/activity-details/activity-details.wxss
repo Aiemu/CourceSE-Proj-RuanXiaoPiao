@@ -49,7 +49,7 @@
       margin-bottom: 30rpx;
   }
   .buttons{
-    margin: 30rpx;
+    margin: 10rpx;
   }
   .buy-button{
       margin: 55rpx;

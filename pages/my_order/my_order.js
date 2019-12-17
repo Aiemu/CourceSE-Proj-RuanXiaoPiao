@@ -1,5 +1,6 @@
 // pages/my_order/my_order.js
 import Dialog from '../../vant-weapp/dialog/dialog'
+const app = getApp()
 Page({
   /**
    * 页面的初始数据
@@ -15,34 +16,28 @@ Page({
    */
   onLoad: function (options) {
     var that = this
-    wx.login({
-      success: function (data) {
-        var postData = {
-          code: data.code,
-        };
-        wx.request({
-          url: 'http://62.234.50.47/getTicketList/',
-          data: postData,
-          method: 'POST',
-          header: {
-            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-          },
-          success: function (res) {
-            var list = res.data.data.ticketList
-            for (var i = 0; i < list.length; i++) {
-              list[i] = JSON.parse(list[i])
-            }
-            that.setData({
-              orderlist: list
-            })
-          },
-          fail: function (error) {
-            console.log(error);
-          }
+    var postData = {
+      openid: app.globalData.openId
+    }
+    wx.request({
+      url: 'http://62.234.50.47/getTicketList/',
+      data: postData,
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+      },
+      success: function (res) {
+        console.log(res.data)
+        var list = res.data.data.ticketList
+        for (var i = 0; i < list.length; i++) {
+          list[i] = JSON.parse(list[i])
+        }
+        that.setData({
+          orderlist: list
         })
       },
-      fail: function () {
-        console('登录获取Code失败！');
+      fail: function (error) {
+        console.log(error);
       }
     })
   },
@@ -111,68 +106,27 @@ Page({
       width: '700rpx'
     }).then(() => {
       // on confirm
-      wx.login({
-        success: function (data) {
-          console.log('获取登录 Code：' + data.code)
-          var postData = {
-            code: data.code,
-            ticket_id: e.currentTarget.dataset.id,
-          };
-          wx.request({
-            url: 'http://62.234.50.47/refundTicket/',
-            data: postData,
-            method: 'POST',
-            header: {
-              'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-            },
-            success: function (res) {
-              //回调处理
-              console.log('getOpenID-OK!');
-              console.log(res.data);
-              that.onLoad()
-            },
-            fail: function (error) {
-              console.log(error);
-            }
-          })
+      var postData = {
+        openid: app.globalData.openId,
+        ticket_id: e.currentTarget.dataset.id,
+      }
+      wx.request({
+        url: 'http://62.234.50.47/refundTicket/',
+        data: postData,
+        method: 'POST',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
         },
-        fail: function () {
-          console('登录获取Code失败！');
+        success: function (res) {
+          //回调处理
+          console.log('getOpenID-OK!');
+          console.log(res.data);
+          that.onLoad()
+        },
+        fail: function (error) {
+          console.log(error);
         }
       })
-
-      wx.login({
-        success: function (data) {
-          var postData = {
-            code: data.code,
-          };
-          wx.request({
-            url: 'http://62.234.50.47/getTicketList/',
-            data: postData,
-            method: 'POST',
-            header: {
-              'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-            },
-            success: function (res) {
-              var list = res.data.data.ticketList
-              for (var i = 0; i < list.length; i++) {
-                list[i] = JSON.parse(list[i])
-              }
-              that.setData({
-                orderlist: list
-              })
-              console.log(that.data.orderlist)
-            },
-            fail: function (error) {
-              console.log(error);
-            }
-          })
-        },
-        fail: function () {
-          console('登录获取Code失败！');
-        }
-      })
-
     }).catch(() => {
       // on cancel
     });

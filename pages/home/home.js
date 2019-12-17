@@ -1,11 +1,12 @@
 // pages/home/home.js
+const app = getApp()
 Page({
-
   /**
    * 页面的初始数据
    */
   data: {
     is_verify: false,
+    post_verify_flag: false
   },
 
   /**
@@ -26,11 +27,38 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    console.log(getApp().globalData.verifyToken)
-    if(getApp().globalData.verifyToken != 0) {
+    console.log(app.globalData.verifyToken)
+    if(app.globalData.verifyToken) {
       this.setData({
         is_verify: true
       })
+      // 如果前端已认证，但还没发送给后端
+      if(!this.post_verify_flag) {
+        var that = this
+        var postData = {
+          openid: app.globalData.openId
+        }  
+        console.log(postData)
+        wx.request({
+          url: 'http://62.234.50.47/verifyUser/',
+          data: postData,
+          method: 'POST',
+          header: {
+            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+          },
+          success: function (res) {
+            console.log(res.data)
+            that.post_verify_flag = true
+            that.setData({
+              post_verify_flag: true
+            })
+          },
+          fail: function (error) {
+            console.log(error);
+          }
+        })
+    
+      }
     }
   },
 

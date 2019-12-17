@@ -1,4 +1,5 @@
 // pages/ticket/ticket.js
+const app = getApp()
 Page({
 
   /**
@@ -14,32 +15,25 @@ Page({
    */
   onLoad: function (options) {
     var that = this
-    wx.login({
-      success: function (data) {
-        var postData = {
-          code: data.code,
-          ticket_id: options.id
-        };
-        wx.request({
-          url: 'http://62.234.50.47/getTicketInfo/',
-          data: postData,
-          method: 'POST',
-          header: {
-            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-          },
-          success: function (res) {
-            //回调处理
-            that.setData({
-              info: res.data.data
-            })
-          },
-          fail: function (error) {
-            console.log(error);
-          }
+    var postData = {
+      openid: app.globalData.openId,
+      ticket_id: options.id
+    };
+    wx.request({
+      url: 'http://62.234.50.47/getTicketInfo/',
+      data: postData,
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+      },
+      success: function (res) {
+        //回调处理
+        that.setData({
+          info: res.data.data
         })
       },
-      fail: function () {
-        console('登录获取Code失败！');
+      fail: function (error) {
+        console.log(error);
       }
     })
   },

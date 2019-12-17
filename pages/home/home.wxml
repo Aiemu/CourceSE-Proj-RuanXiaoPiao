@@ -19,5 +19,5 @@
   <image class="img"></image>
   <text>我的收藏</text>
 </view>
-<button class="btn_verify" wx:if="{{is_verify == false}}" bindtap="verify">点击认证</button>
+<button class="btn_verify" wx:if="{{!is_verify}}" bindtap="verify">绑定清华学号</button>
 

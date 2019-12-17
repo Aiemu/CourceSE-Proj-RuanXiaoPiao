@@ -2,7 +2,7 @@ import Dialog from '../../vant-weapp/dialog/dialog'
 import Toast from '../../vant-weapp/toast/toast'
 //富文本转换器
 let WxParse = require('../../wxParse/wxParse.js')
-
+let app = getApp()
 
 Page({
     data: {
@@ -48,45 +48,38 @@ Page({
     },
     getIfCollectThisAct: function() {
         var that = this
-        wx.login({
-          success: function (data) {
-            var postData = {
-              code: data.code,
-            };
-            wx.request({
-              url: 'http://62.234.50.47/getStarList/',
-              data: postData,
-              method: 'POST',
-              header: {
-                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-              },
-              success: function (res) {
-                var list = res.data.data.activityList
-                for (var i = 0; i < list.length; i++) {
-                  list[i] = JSON.parse(list[i])
+        var postData = {
+            openid: app.globalData.openId
+        };
+        wx.request({
+            url: 'http://62.234.50.47/getStarList/',
+            data: postData,
+            method: 'POST',
+            header: {
+            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+            var list = res.data.data.activityList
+            for (var i = 0; i < list.length; i++) {
+                list[i] = JSON.parse(list[i])
+            }
+            let actID = that.activityId
+            for(let act in list) {
+                act = list[act]
+                if(act.activity_id == actID) {
+                    that.setData({
+                        collected: true
+                    })
+                    return
                 }
-                let actID = that.activityId
-                for(let act in list) {
-                    act = list[act]
-                    if(act.activity_id == actID) {
-                        that.setData({
-                            collected: true
-                        })
-                        return
-                    }
-                }
-                that.setData({
-                    collected: false
-                })
-              },
-              fail: function (error) {
-                console.log(error);
-              }
+            }
+            that.setData({
+                collected: false
             })
-          },
-          fail: function () {
-            console('登录获取Code失败！');
-          }
+            },
+            fail: function (error) {
+            console.log(error);
+            }
         })
       },    
     
@@ -94,41 +87,33 @@ Page({
         let that = this
         let ifCollected = that.data.collected
         console.log("ifC:"+ifCollected)
-        wx.login({
-            success: function (data) {
-                console.log('获取 Code：' + data.code)
-                var postData = {
-                    code: data.code,
-                    activity_id: that.activityId,
-                }
-                let tmpUrl = 'http://62.234.50.47/starActivity/'
-                if(ifCollected) {
-                    tmpUrl = 'http://62.234.50.47/deleteStar/'
-                }
-                wx.request({
-                    url: tmpUrl,
-                    data: postData,
-                    method: 'POST',
-                    header: {
-                        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-                    },
-                    success: function (res) {
-                        //回调处理
-                        console.log('getOpenID-OK!');
-                        console.log(res.data);
-                    
-                        that.setData({
-                            collected: !ifCollected
-                        })
-                        console.log(that.data.collected)
-                    },
-                    fail: function (error) {
-                        console.log(error);
-                    }
-                })
+        var postData = {
+            openid: app.globalData.openId,
+            activity_id: that.activityId,
+        }
+        let tmpUrl = 'http://62.234.50.47/starActivity/'
+        if(ifCollected) {
+            tmpUrl = 'http://62.234.50.47/deleteStar/'
+        }
+        wx.request({
+            url: tmpUrl,
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
             },
-            fail: function () {
-                console('登录获取Code失败！');
+            success: function (res) {
+                //回调处理
+                console.log('getOpenID-OK!');
+                console.log(res.data);
+            
+                that.setData({
+                    collected: !ifCollected
+                })
+                console.log(that.data.collected)
+            },
+            fail: function (error) {
+                console.log(error);
             }
         })
     },
@@ -144,63 +129,49 @@ Page({
         }
     },
     onClickTicketing(e) {
-        // 看是否是多长次或需要支付
-        // 不是，则直接弹出对话框确认购买
-        // 否饿，跳到选择支付页面
-        console.log(this)
-        let temp = false
-        if (!temp) {
-            Dialog.confirm({
-                title: '确认抢票',
-                message: '确认要抢 ' + this.data.activityDetail.basicInfo.title + ' 的票吗?'
-              }).then(() => {
-                // on confirm
-                this.buyTicket()
-              }).catch(() => {
-                // on cancel
-              });
+        let that = this
+        if(!app.globalData.verifyToken) {
+            Toast.fail('尚未绑定清华账户!')
         }
         else {
-            wx.navigateTo({
-                url: '/pages/buy-ticket/buy-ticket?id=' + this.activityId
-              })      
+            Dialog.confirm({
+                title: '确认抢票',
+                message: '确认要抢 ' + that.data.activityDetail.basicInfo.title + ' 的票吗?'
+                }).then(() => {
+                    // on confirm
+                    that.buyTicket()
+                }).catch(() => {
+                    // on cancel
+                })
         }
     },
     buyTicket() {
         let that = this
-        wx.login({
-            success: function (data) {
-                console.log('获取购买 Code：' + data.code)
-                var postData = {
-                    code: data.code,
-                    activity_id: that.activityId
-                }
-                wx.request({
-                    url: 'http://62.234.50.47/purchaseTicket/',
-                    data: postData,
-                    method: 'POST',
-                    header: {
-                        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-                    },
-                    success: function (res) {
-                        //回调处理
-                        console.log('getOpenID-OK!');
-                        console.log(res.data);
-                        if(res.data.code == "002") {
-                            Toast.success('抢票成功!')
-                        }
-                        else {
-                            Toast.fail('票已存在!')
-                        }
-                    },
-                    fail: function (error) {
-                        console.log(error);
-                    }
-                })
+        var postData = {
+            openid: app.globalData.openId,
+            activity_id: that.activityId
+        }
+        wx.request({
+            url: 'http://62.234.50.47/purchaseTicket/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
             },
-            fail: function () {
-                console('登录获取Code失败！');
+            success: function (res) {
+                //回调处理
+                console.log('getOpenID-OK!');
+                console.log(res.data);
+                if(res.data.code == "020") {
+                    Toast.success('抢票成功!')
+                }
+                else {
+                    Toast.fail('票已存在!')
+                }
+            },
+            fail: function (error) {
+                console.log(error);
             }
-        })        
-    }
+        })
+    },
 })
