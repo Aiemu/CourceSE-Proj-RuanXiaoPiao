@@ -412,7 +412,6 @@ def refundTicket(request):
         ret = {'code': '102', 'msg': None,'data':{}}
         ret['msg'] = '退票失败，该票不存在'
         ret['data'] = {
-            'openid': openid,
             'ticket_id': ticket_id,
         }
         return JsonResponse(ret)
