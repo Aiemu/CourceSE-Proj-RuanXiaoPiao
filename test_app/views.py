@@ -775,20 +775,17 @@ def saveTestData(request):
 
 
 '''
-Part 4
-Intro: Function to show page for testing net connect
-Num: 1
+Part 5
+Intro: Function to operate QRCode
+Num: 2
 List: 
     - index(request)
 '''
 
-def index(request):
-    return HttpResponse("Hello! You are at the index page")
-
-# 产生二维码的测试
 def testQRCode(request):
     test_ticket = Ticket.objects.get(ticket_id = 20)
-    # 创造新二维码
+
+    # create new QRCode
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -811,7 +808,7 @@ def testQRCode(request):
 
 def logo(request):
     test_ticket = Ticket.objects.get(ticket_id = 20)
-    # 创造新二维码
+    # create new QRCode
     qr = qrcode.QRCode(
         version=5,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -844,3 +841,16 @@ def logo(request):
     test_ticket.save()
 
     return HttpResponse(test_ticket.QRCode.url)
+
+
+
+'''
+Part 5
+Intro: Function to show page for testing net connect
+Num: 1
+List: 
+    - index(request)
+'''
+
+def index(request):
+    return HttpResponse("Hello! You are at the index page")

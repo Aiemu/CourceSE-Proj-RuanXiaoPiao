@@ -50,7 +50,7 @@ urlpatterns = [
     # save test data
     path('saveTestData/', views.saveTestData), # 存入测试数据 
 
-    # 产生二维码的测试
+    # QRCode
     path('testQRCode/', views.testQRCode),
     path('logo/', views.logo),
 
