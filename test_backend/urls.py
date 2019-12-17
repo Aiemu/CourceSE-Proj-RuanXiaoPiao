@@ -21,20 +21,33 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # admin
     path('admin/', admin.site.urls), # 管理
+
+    # test
     path('index/', views.index), # HelloWorld测试界面
+
+    # init
     path('init/', views.init), #授权
+
+    # activity
     path('getActivityList/', views.getActivityList), # 获取活动列表
-    path('purchaseTicket/', views.purchaseTicket), # 购票
-    path('getTicketList/', views.getTicketList), # 获取已购票列表
-    path('getActivityInfo/', views.getActivityInfo), # 获取活动详情
-    path('getTicketInfo/', views.getTicketInfo), # 获取票的详情
-    path('refundTicket/', views.refundTicket), # 退票
-    path('searchEngine/', views.searchEngine), # 搜索
-    path('saveTestData/', views.saveTestData), # 存入测试数据
+    path('getActivityInfo/', views.getActivityInfo), # 获取活动详情 
+    path('getScrollActivity/', views.getScrollActivity), # 获取滚图活动
+    path('searchEngine/', views.searchEngine), # 搜索 
+
+    # ticket
+    path('purchaseTicket/', views.purchaseTicket), # 购票 
+    path('refundTicket/', views.refundTicket), # 退票 
+    path('getTicketList/', views.getTicketList), # 获取已购票列表 
+    path('getTicketInfo/', views.getTicketInfo), # 获取票的详情 
+
+    # star
     path('starActivity/', views.starActivity), # 收藏
     path('deleteStar/', views.deleteStar), # 取消收藏
-    path('getStarList/', views.getStarList), # 获取收藏列表
-    path('getScrollActivity/', views.getScrollActivity), # 获取滚图活动
+    path('getStarList/', views.deleteStar), # 获取收藏列表
+
+    # save test data
+    path('saveTestData/', views.saveTestData), # 存入测试数据 
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

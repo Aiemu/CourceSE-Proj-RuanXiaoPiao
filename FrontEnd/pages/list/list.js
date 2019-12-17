@@ -1,11 +1,11 @@
 Page({
     getActivityList: function() {
         var postData = {
-            str: 'get list'
+            str: 'get list',
         };
         wx.request({
-            url: 'http://62.234.50.47/getActivityList/',
-            // url: 'http://127.0.0.1:8000/getActivityList/',
+            // url: 'http://62.234.50.47/getActivityList/',
+            url: 'http://127.0.0.1:8000/getActivityList/',
             data: postData,
             method: 'POST',
             header: {
@@ -26,8 +26,7 @@ Page({
             str: 'get list'
         };
         wx.request({
-            url: 'http://62.234.50.47/getScrollActivity/',
-            // url: 'http://127.0.0.1:8000/getScrollActivity/',
+            url: 'http://127.0.0.1:8000/getScrollActivity/',
             data: postData,
             method: 'POST',
             header: {
@@ -48,7 +47,7 @@ Page({
             activity_id: 2,
         };
         wx.request({
-            url: 'http://62.234.50.47/getActivityInfo/',
+            url: 'http://127.0.0.1:8000/getActivityInfo/',
             data: postData,
             method: 'POST',
             header: {
@@ -70,11 +69,12 @@ Page({
             success: function (data) {
                 console.log('获取购买 Code：' + data.code)
                 var postData = {
-                    code: data.code,
+                    // code: data.code,
+                    openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
                     activity_id: 4, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/purchaseTicket/',
+                    url: 'http://127.0.0.1:8000/purchaseTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -102,11 +102,12 @@ Page({
             success: function (data) {
                 console.log('获取 Code：' + data.code)
                 var postData = {
-                    code: data.code,
-                    activity_id: 1, // TODO
+                    // code: data.code,
+                    openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
+                    activity_id: 3, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/starActivity/',
+                    url: 'http://127.0.0.1:8000/starActivity/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -134,11 +135,12 @@ Page({
             success: function (data) {
                 console.log('获取 Code：' + data.code)
                 var postData = {
-                    code: data.code,
-                    activity_id: 1, // TODO
+                    // code: data.code,
+                    openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
+                    activity_id: 3, // TODO
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/deleteStar/',
+                    url: 'http://127.0.0.1:8000/deleteStar/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -165,7 +167,7 @@ Page({
             line: '大礼堂项目部'
         };
         wx.request({
-            url: 'http://62.234.50.47/searchEngine/',
+            url: 'http://127.0.0.1:8000/searchEngine/',
             data: postData,
             method: 'POST',
             header: {
