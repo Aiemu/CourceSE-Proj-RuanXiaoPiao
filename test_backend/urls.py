@@ -20,38 +20,47 @@ from test_app import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+'''
+状态码为三位，形如：000
+首位为状态描述，0为成功，1为用户异常，2为活动异常，3为票异常，4为其他异常
+后两位标记函数
+    第二位为Part序号标记
+    末位为Part中的函数序号
+'''
+
 urlpatterns = [
+    # Part 0: init
+    path('init/', views.init), # 授权 00
+
+    # Part 1: activity
+    path('getActivityList/', views.getActivityList), # 获取活动列表 10
+    path('getActivityInfo/', views.getActivityInfo), # 获取活动详情 11
+    path('getScrollActivity/', views.getScrollActivity), # 获取滚图活动 12
+    path('searchEngine/', views.searchEngine), # 搜索 13
+
+    # Part 2: ticket
+    path('purchaseTicket/', views.purchaseTicket), # 购票 20
+    path('refundTicket/', views.refundTicket), # 退票 21
+    path('getTicketList/', views.getTicketList), # 获取已购票列表 22
+    path('getTicketInfo/', views.getTicketInfo), # 获取票的详情 23
+
+    # Part 3: star
+    path('starActivity/', views.starActivity), # 收藏 30
+    path('deleteStar/', views.deleteStar), # 取消收藏 31
+    path('getStarList/', views.getStarList), # 获取收藏列表 32
+
+    # Part 4: QRCode
+    path('testQRCode/', views.testQRCode), # 测试二维码 40
+    path('logo/', views.logo), # 添加二维码logo 41
+
+    # Part 5: save test data
+    path('saveTestData/', views.saveTestData), # 存入测试数据 50
+
+    # Part 6: test
+    path('index/', views.index), # 测试界面 60
+
     # admin
     path('admin/', admin.site.urls), # 管理
 
-    # test
-    path('index/', views.index), # HelloWorld测试界面
-
-    # init
-    path('init/', views.init), #授权
-
-    # activity
-    path('getActivityList/', views.getActivityList), # 获取活动列表
-    path('getActivityInfo/', views.getActivityInfo), # 获取活动详情 
-    path('getScrollActivity/', views.getScrollActivity), # 获取滚图活动
-    path('searchEngine/', views.searchEngine), # 搜索 
-
-    # ticket
-    path('purchaseTicket/', views.purchaseTicket), # 购票 
-    path('refundTicket/', views.refundTicket), # 退票 
-    path('getTicketList/', views.getTicketList), # 获取已购票列表 
-    path('getTicketInfo/', views.getTicketInfo), # 获取票的详情 
-
-    # star
-    path('starActivity/', views.starActivity), # 收藏
-    path('deleteStar/', views.deleteStar), # 取消收藏
-    path('getStarList/', views.getStarList), # 获取收藏列表
-
-    # save test data
-    path('saveTestData/', views.saveTestData), # 存入测试数据 
-
-    # QRCode
-    path('testQRCode/', views.testQRCode),
-    path('logo/', views.logo),
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
