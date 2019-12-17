@@ -42,6 +42,16 @@ List:
 @api_view(['POST'])
 
 def init(request):
+    '''
+    Intro: 
+        get openid, add user into database
+    Args(request): 
+        code(str): used as certificate to get openid
+        user_info(str): used to enrich user's info in database
+    Returns:    
+        {code: 000, msg: 授权成功, data: {jwt(str), openid(str), nickname(str)}}
+
+    '''
     # code & userinfo
     js_code = request.POST.get('code')
     user_info = request.POST.get('info')
@@ -97,7 +107,15 @@ List:
     - searchEngine(request)
 '''
 
-def getActivityList(request):
+def getActivityList(request): 
+    '''
+    Intro: 
+        return all activities in database
+    Args(request): 
+        None
+    Returns: 
+        {code: 010, msg: 获取活动列表成功, data: {activityList(list)}}
+    '''
     # encode date
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -149,7 +167,20 @@ def getActivityList(request):
     }
     return JsonResponse(ret)
 
-def getActivityInfo(request):
+def getActivityInfo(request): 
+    '''
+    Intro: 
+        get the details of an activity with activity_id
+    Args(request): 
+        activity_id(int): used to identify activity
+    Returns: 
+        {code: 211, msg: 获取活动详情失败，该活动不存在, data: {activity_id(int)}}
+        {code: 011, msg: 活动详情获取成功, data: {activity_id(int), title(str), 
+                                            image(str), status(str), remain(int), 
+                                            publisher(str), description(str), 
+                                            time(date), place(str), price(double), 
+                                            heat(double)}}
+    '''
     # get activity_id
     activity_id = request.POST.get('activity_id')
 
@@ -186,7 +217,15 @@ def getActivityInfo(request):
     }
     return JsonResponse(ret)
 
-def getScrollActivity(request):
+def getScrollActivity(request): 
+    '''
+    Intro: 
+        return top 5 activities(rank with heat)
+    Args(request): 
+        None
+    Returns: 
+        {code: 012, msg: 获取滚图成功, data: {activityList(list)}}
+    '''
     # encode date
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -218,7 +257,7 @@ def getScrollActivity(request):
                 'image': 'http://62.234.50.47' + item.image.url,
                 'heat': item.heat,
             }
-            iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+            iJson = json.dumps(i, cls = DateEncoder)
             retList.append(iJson)
             count += 1
         else:
@@ -232,13 +271,20 @@ def getScrollActivity(request):
     }
     return JsonResponse(ret)
 
-def searchEngine(request):
+def searchEngine(request): 
+    '''
+    Intro: 
+        cut line into words, use words to compare with activitise' info to get suitable activities
+    Args(request): 
+        line(str): what user typed in edit-line
+    Returns: 
+        {code: 013, msg: 搜索成功, data: {actList(list)}}
+    '''
+    # encode date
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, datetime.datetime):
                 return obj.strftime("%Y-%m-%d %H:%M:%S")
-            # elif isinstance(obj, date):
-            #     return obj.strftime("%Y-%m-%d")
             else:
                 return json.JSONEncoder.default(self, obj)
 
@@ -319,7 +365,21 @@ List:
     - getTicketInfo(request)
 '''
 
-def purchaseTicket(request):
+def purchaseTicket(request): 
+    '''
+    Intro: 
+        create new ticket and add it into user's ticket list
+    Args(request): 
+        openid(str): used to identify user, saved in the cache of front-end
+        activity_id: used to identify activity
+    Returns: 
+        {code: 120, msg: 购票失败，该用户不存在, data: {openid(str), activity_id(int)}}
+        {code: 220, msg: 购票失败，该活动不存在, data: {openid(str), activity_id(int)}}
+        {code: 320, msg: 购票失败，余票不足, data: {openid(str), activity_id(int), remain(int)}}
+        {code: 320, msg: 购票失败，票已存在, data: {openid(str), activity_id(int), remain(int)}}
+        {code: 020, msg: 购票成功, data: {openid(str), activity_id(int), remain(int)}}
+
+    '''
     # get openid & activity_id
     openid = request.POST.get('openid')
     activity_id = request.POST.get('activity_id')
@@ -354,7 +414,7 @@ def purchaseTicket(request):
         ret = {'code': '320', 'msg': None,'data':{}}
         ret['msg'] = '购票失败，余票不足'
         ret['data'] = {
-            'user': user.username,
+            'openid': openid,
             'activity_id': activity_id,
             'remain': activity.remain,
         }
@@ -371,8 +431,7 @@ def purchaseTicket(request):
                     ret = {'code': '320', 'msg': None,'data':{}}
                     ret['msg'] = '购票失败，票已存在'
                     ret['data'] = {
-                        'user_id': user.user_id,
-                        'user': user.username,
+                        'openid': openid,
                         'activity_id': activity.activity_id,
                         'remain': activity.remain,
                     }
@@ -400,14 +459,23 @@ def purchaseTicket(request):
         ret = {'code': '020', 'msg': None,'data':{}}
         ret['msg'] = '购票成功'
         ret['data'] = {
-            'user_id': user.user_id,
-            'user': user.username,
+            'openid': openid,
             'activity_id': activity.activity_id,
             'remain': activity.remain,
         }
         return JsonResponse(ret)
 
-def refundTicket(request):
+def refundTicket(request): 
+    '''
+    Intro: 
+        update ticket's is_valid into false
+    Args(request): 
+        ticket_id(int): used to identify ticket
+    Returns: 
+        {code: 321, msg: 退票失败，该票不存在, data: {ticket_id(int)}}
+        {code: 021, msg: 退票成功, data: {ticket_id(int), is_valid(bool)}}
+        {code: 321, msg: 退票失败，该票为已退票状态, data: {ticket_id(int), is_valid(bool)}}
+    '''
     # get ticket_id
     ticket_id = request.POST.get('ticket_id')
 
@@ -450,14 +518,23 @@ def refundTicket(request):
     else:
         # ret msg
         ret = {'code': '321', 'msg': None,'data':{}}
-        ret['msg'] = '退票失败，该票已为退票状态'
+        ret['msg'] = '退票失败，该票为已退票状态'
         ret['data'] = {
             'ticket_id': ticket_id,
             'is_valid': ticket.is_valid,
         }
     return JsonResponse(ret)
 
-def getTicketList(request):
+def getTicketList(request): 
+    '''
+    Intro: 
+        return user's all tickets, include refunded ones
+    Args(request): 
+        openid: used to identify user
+    Returns: 
+        {code: 122, msg: 获取已购票列表失败，该用户不存在, data: {openid(str)}}
+        {code: 022, msg: 获取已购票列表成功, data: {openid(str), ticketList(list)}}
+    '''
     # encode date
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -474,9 +551,8 @@ def getTicketList(request):
         user = User.objects.get(openid = openid)
     except:
         ret = {'code': '122', 'msg': None,'data':{}}
-        ret['msg'] = '获取已购票列表失败，用户不存在'
+        ret['msg'] = '获取已购票列表失败，该用户不存在'
         ret['data'] = {
-            # 'code': js_code,
             'openid': openid,
         }
         return JsonResponse(ret)
@@ -490,11 +566,9 @@ def getTicketList(request):
         # create json
         i = {
             'ticket_id': item.ticket_id,
-            # 'owner': item.owner.username, 
             'ticket_status': item.is_valid,
             'activity_status': item.activity.status,
             'activity_image': 'http://62.234.50.47' + item.activity.image.url,
-            # 'activity_id': item.activity.activity_id,
             'title': item.activity.title,
             'time': item.activity.time,
             'place': item.activity.place,
@@ -513,7 +587,19 @@ def getTicketList(request):
     }
     return JsonResponse(ret)
 
-def getTicketInfo(request):
+def getTicketInfo(request): 
+    '''
+    Intro: 
+        get ticket's info from database and return
+    Args(request): 
+        ticket_id(int): used to identify ticket
+    Returns: 
+        {code: 323, msg: 获取票详情失败，该票不存在, data: {ticket_id(int)}}
+        {code: 023, msg: 获取票详情成功, data: {ticket_id(int), owner(str), title(str), 
+                                            price(double), place(str), heat(double), 
+                                            tic_time(date), act_time(date), is_valid(bool), 
+                                            QRCode(image)}}
+    '''
     # get ticket_id
     ticket_id = request.POST.get('ticket_id')
 
@@ -522,7 +608,7 @@ def getTicketInfo(request):
         ticket = Ticket.objects.get(ticket_id = ticket_id)
     except:
         ret = {'code': '323', 'msg': None,'data':{}}
-        ret['msg'] = '获取票详情失败，票不存在'
+        ret['msg'] = '获取票详情失败，该票不存在'
         ret['data'] = {
             'ticket_id': ticket_id,
         }
@@ -530,7 +616,7 @@ def getTicketInfo(request):
 
     # ret msg
     ret = {'code': '023', 'msg': None,'data':{}}
-    ret['msg'] = '票详情获取成功'
+    ret['msg'] = '获取票详情成功'
     ret['data'] = {
         'ticket_id': ticket_id,
         'owner': ticket.owner.username,
@@ -557,7 +643,18 @@ List:
     - deleteStar(request)
 '''
 
-def starActivity(request):
+def starActivity(request): 
+    '''
+    Intro: 
+        add activity into user's star list
+    Args(request): 
+        openid(str): used to identify user
+        activity_id(int): used to identify activity
+    Returns: 
+        {code: 130, msg: 收藏失败，该用户不存在, data: {openid(str), activity_id(int)}}
+        {code: 230, msg: 收藏失败，该活动不存在, data: {openid(str), activity_id(int)}}
+        {code: 030, msg: 收藏成功, data: {openid(str), activity_id(int)}}
+    '''
     # get openid & activity_id
     openid = request.POST.get('openid')
     activity_id = request.POST.get('activity_id')
@@ -603,12 +700,23 @@ def starActivity(request):
     ret = {'code': '030', 'msg': None,'data':{}}
     ret['msg'] = '收藏成功'
     ret['data'] = {
-        'user': user.username,
-        'activity': activity.activity_id,
+        'openid': openid,
+        'activity_id': activity.activity_id,
     }
     return JsonResponse(ret)
 
-def deleteStar(request):
+def deleteStar(request): 
+    '''
+    Intro: 
+        delete activity from user's star list
+    Args(request): 
+        openid(str): used to identify user
+        activity_id: used to identify activity
+    Returns: 
+        {code: 131, msg: 取消收藏失败，该用户不存在, data: {openid(str), activity_id(int)}}
+        {code: 231, msg: 取消收藏失败，该活动不存在, data: {openid(str), activity_id(int)}}
+        {code: 031, msg: 取消收藏成功, data: {openid(str), activity_id(int)}}
+    '''
     # get openid & activity_id
     openid = request.POST.get('openid')
     activity_id = request.POST.get('activity_id')
@@ -651,13 +759,21 @@ def deleteStar(request):
     ret = {'code': '031', 'msg': None,'data':{}}
     ret['msg'] = '取消收藏成功'
     ret['data'] = {
-        'user': user.username,
-        'activity': activity.activity_id,
+        'openid': openid,
+        'activity_id': activity_id,
     }
     return JsonResponse(ret)
 
-
-def getStarList(request):
+def getStarList(request): 
+    '''
+    Intro: 
+        return user's star list
+    Args(request): 
+        openid(str): used to identify user
+    Returns: 
+        {code: 132, msg: 获取收藏列表失败，该用户不存在, data: {openid(str)}}
+        {code: 032, msg: 收藏列表获取成功, data: {activityList(list)}}
+    '''
     # get openid
     openid = request.POST.get('openid')
     
@@ -730,7 +846,15 @@ List:
     - index(request)
 '''
 
-def testQRCode(request):
+def testQRCode(request): 
+    '''
+    Intro: 
+        
+    Args(request): 
+        
+    Returns: 
+        {code: , msg: , data: {}}
+    '''
     test_ticket = Ticket.objects.get(ticket_id = 20)
 
     # create new QRCode
@@ -754,7 +878,15 @@ def testQRCode(request):
     '''
     return HttpResponse(test_ticket.QRCode.url)
 
-def logo(request):
+def logo(request): 
+    '''
+    Intro: 
+        
+    Args(request): 
+        
+    Returns: 
+        {code: , msg: , data: {}}
+    '''
     test_ticket = Ticket.objects.get(ticket_id = 20)
     # create new QRCode
     qr = qrcode.QRCode(
@@ -801,7 +933,16 @@ List:
 '''
 
 # 初始化测试数据库
-def saveTestData(request):
+def saveTestData(request): 
+    '''
+    Intro: 
+        save some data into database
+    Args(request): 
+        None
+    Returns: 
+        {code: 050, msg: 保存成功, data: {newUser(str), newActivity(list)}}
+
+    '''
     # test data for user
     openid = 'testOpenid'
 
@@ -844,7 +985,7 @@ def saveTestData(request):
     ret = {'code': '050', 'msg': None,'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
-        'newUser': user.username,
+        'newUser': user.openid,
         'newActivity': [activity1.title, activity2.title]
         # 'newTicket': ticket.ticket_id,
     }
@@ -860,5 +1001,13 @@ List:
     - index(request)
 '''
 
-def index(request):
+def index(request): 
+    '''
+    Intro: 
+        Used to test net connection
+    Args(request): 
+        None
+    Returns: 
+        None
+    '''
     return HttpResponse("060\nHello! You are at the index page")
