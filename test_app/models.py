@@ -34,10 +34,8 @@ class User(models.Model):
     starred = models.ManyToManyField(Activity)
 
     # varify info
-    # user_permissions = models.ManyToManyField() 
-    # is_verified = models.BooleanField() # 学号登录验证接口
+    is_verified = models.BooleanField(default=False) # 学号登录验证接口
 
-    # 指定表名,否则默认为test_app_User
     class Meta:
         db_table = 'User'
 

@@ -50,7 +50,6 @@ def init(request):
         user_info(str): used to enrich user's info in database
     Returns:    
         {code: 000, msg: 授权成功, data: {jwt(str), openid(str), nickname(str)}}
-
     '''
     # code & userinfo
     js_code = request.POST.get('code')
@@ -91,6 +90,44 @@ def init(request):
         'jwt': jwt,
         'openid': user.openid,
         'nickname': user.username
+    }
+    return JsonResponse(ret)
+
+def verifyUser(request):
+    '''
+    Intro: 
+        update user's is_verified
+    Args(request): 
+        openid(str): used to identify user
+    Returns: 
+        {code: 101, msg: 认证失败，该用户不存在, data: {openid(str)}}
+        {code: 001, msg: 认证成功, data: {openid(str)}}
+    '''
+    # get openid
+    openid = request.POST.get('openid')
+
+    # get user
+    try: 
+        user = User.objects.get(openid = openid)
+    except:
+        ret = {'code': '101', 'msg': None,'data':{}}
+        ret['msg'] = '认证失败，该用户不存在'
+        ret['data'] = {
+            'openid': openid,
+        }
+        return JsonResponse(ret)
+    
+    # update user
+    user.is_verified = True
+
+    # save
+    user.save()
+
+    # ret msg
+    ret = {'code': '001', 'msg': None,'data':{}}
+    ret['msg'] = '认证成功'
+    ret['data'] = {
+        'openid': openid,
     }
     return JsonResponse(ret)
 
@@ -374,6 +411,7 @@ def purchaseTicket(request):
         activity_id: used to identify activity
     Returns: 
         {code: 120, msg: 购票失败，该用户不存在, data: {openid(str), activity_id(int)}}
+        {code: 120, msg: 购票失败，该用户未认证, data: {openid(str), activity_id(int)}}
         {code: 220, msg: 购票失败，该活动不存在, data: {openid(str), activity_id(int)}}
         {code: 320, msg: 购票失败，余票不足, data: {openid(str), activity_id(int), remain(int)}}
         {code: 320, msg: 购票失败，票已存在, data: {openid(str), activity_id(int), remain(int)}}
@@ -390,6 +428,16 @@ def purchaseTicket(request):
     except:
         ret = {'code': '120', 'msg': None,'data':{}}
         ret['msg'] = '购票失败，该用户不存在'
+        ret['data'] = {
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+    # check if user is verified
+    if not user.is_verified: 
+        ret = {'code': '120', 'msg': None,'data':{}}
+        ret['msg'] = '购票失败，该用户未认证'
         ret['data'] = {
             'openid': openid,
             'activity_id': activity_id,
@@ -449,7 +497,7 @@ def purchaseTicket(request):
         # create new ticket
         ticket = Ticket(owner = user, activity = activity)
         
-        # varify ticket
+        # verify ticket
         ticket.is_valid = True 
 
         # save ticket

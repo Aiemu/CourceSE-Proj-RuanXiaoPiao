@@ -71,6 +71,7 @@ Page({
                 var postData = {
                     // code: data.code,
                     openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
+                    // openid: 'testOpenid',
                     activity_id: 4, // TODO
                 };
                 wx.request({

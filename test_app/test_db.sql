@@ -1,1 +1,0 @@
-SELECT * FROM `test_db`.`User` LIMIT 1000;

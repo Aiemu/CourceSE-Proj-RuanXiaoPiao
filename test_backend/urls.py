@@ -31,6 +31,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     # Part 0: init
     path('init/', views.init), # 授权 00
+    path('verifyUser/', views.verifyUser), # 认证 01
 
     # Part 1: activity
     path('getActivityList/', views.getActivityList), # 获取活动列表 10
@@ -59,8 +60,8 @@ urlpatterns = [
     # Part 6: test
     path('index/', views.index), # 测试界面 60
 
-    # admin
-    path('admin/', admin.site.urls), # 管理
+    # Part 7: admin
+    path('admin/', admin.site.urls), # 管理 70
 
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
