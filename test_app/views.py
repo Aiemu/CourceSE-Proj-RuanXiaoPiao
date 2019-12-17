@@ -11,8 +11,10 @@ import pandas as pds
 import datetime
 import jieba
 import re
+import qrcode
 
 # from django.conf import settings
+from PIL import Image
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
@@ -781,4 +783,64 @@ List:
 '''
 
 def index(request):
-    return HttpResponse("Hello! You are at the index page.")
+    return HttpResponse("Hello! You are at the index page")
+
+# 产生二维码的测试
+def testQRCode(request):
+    test_ticket = Ticket.objects.get(ticket_id = 20)
+    # 创造新二维码
+    qr = qrcode.QRCode(
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=2,
+    )
+    url='another_test_qrcode'
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image()
+    img.save('media/QR/test_qrcode.png')
+    test_ticket.QRCode = 'QR/test_qrcode.png'
+    test_ticket.save()
+    '''
+    ERROR_CORRECT_L: 大约7%或更少的错误能被纠正
+    ERROR_CORRECT_M:（默认）大约15%或更少的错误能被纠正
+    ROR_CORRECT_H:大约30%或更少的错误能被纠正
+    '''
+    return HttpResponse(test_ticket.QRCode.url)
+
+def logo(request):
+    test_ticket = Ticket.objects.get(ticket_id = 20)
+    # 创造新二维码
+    qr = qrcode.QRCode(
+        version=5,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=8,
+        border=4,
+    )
+    url='logo_qrcode'
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image()
+    img = img.convert("RGBA")
+    icon = Image.open('media/logo.png')
+    img_w, img_h = img.size
+    factor = 4
+    size_w = int(img_w / factor)
+    size_h = int(img_h / factor)
+    icon_w, icon_h = icon.size
+    if icon_w >size_w:
+        icon_w = size_w
+    if icon_h > size_h:
+        icon_h = size_h
+    icon = icon.resize((icon_w,icon_h),Image.ANTIALIAS)
+    w = int((img_w - icon_w) / 2)
+    h = int((img_h - icon_h) / 2)
+    icon = icon.convert("RGBA")
+    img.paste(icon, (w, h), icon)
+
+    img.save('media/QR/test_qrcode.png')
+    test_ticket.QRCode = 'QR/test_qrcode.png'
+    test_ticket.save()
+
+    return HttpResponse(test_ticket.QRCode.url)

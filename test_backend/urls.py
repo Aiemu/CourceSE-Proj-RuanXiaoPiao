@@ -50,4 +50,8 @@ urlpatterns = [
     # save test data
     path('saveTestData/', views.saveTestData), # 存入测试数据 
 
+    # 产生二维码的测试
+    path('testQRCode/', views.testQRCode),
+    path('logo/', views.logo),
+
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
