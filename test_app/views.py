@@ -167,7 +167,7 @@ def purchaseTicket(request):
             # print(ticket)
             for i in ticket:
                 # print('owner:', i.owner.user_id, 'act:', i.activity.activity_id)
-                if i.activity == activity:
+                if i.activity == activity and i.is_valid:
                     ret = {'code': '102', 'msg': None,'data':{}}
                     ret['msg'] = '购票失败，票已存在'
                     ret['data'] = {

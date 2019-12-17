@@ -9,7 +9,7 @@ Page({
                     info: e.detail.rawData,
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/init/',
+                    url: 'http://62.234.50.47/init/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -40,7 +40,7 @@ Page({
                     code: data.code,
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/getTicketList/',
+                    url: 'http://62.234.50.47/getTicketList/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -72,7 +72,7 @@ Page({
                     ticket_id: 11, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/getTicketInfo/',
+                    url: 'http://62.234.50.47/getTicketInfo/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -104,7 +104,7 @@ Page({
                     ticket_id: 11, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/refundTicket/',
+                    url: 'http://62.234.50.47/refundTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -135,7 +135,7 @@ Page({
                     code: data.code,
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/getStarList/',
+                    url: 'http://62.234.50.47/getStarList/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -162,7 +162,7 @@ Page({
             str: 'save test data'
         };
         wx.request({
-            url: 'http://127.0.0.1:8000/saveTestData/',
+            url: 'http://62.234.50.47/saveTestData/',
             data: postData,
             method: 'POST',
             header: {

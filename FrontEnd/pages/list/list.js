@@ -4,7 +4,7 @@ Page({
             str: 'get list'
         };
         wx.request({
-            url: 'http://127.0.0.1:8000/getActivityList/',
+            url: 'http://62.234.50.47/getActivityList/',
             data: postData,
             method: 'POST',
             header: {
@@ -25,7 +25,7 @@ Page({
             activity_id: 2,
         };
         wx.request({
-            url: 'http://127.0.0.1:8000/getActivityInfo/',
+            url: 'http://62.234.50.47/getActivityInfo/',
             data: postData,
             method: 'POST',
             header: {
@@ -51,7 +51,7 @@ Page({
                     activity_id: 4, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/purchaseTicket/',
+                    url: 'http://62.234.50.47/purchaseTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -83,7 +83,7 @@ Page({
                     activity_id: 1, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/starActivity/',
+                    url: 'http://62.234.50.47/starActivity/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -115,7 +115,7 @@ Page({
                     activity_id: 1, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/deleteStar/',
+                    url: 'http://62.234.50.47/deleteStar/',
                     data: postData,
                     method: 'POST',
                     header: {
@@ -142,7 +142,7 @@ Page({
             line: '大礼堂项目部'
         };
         wx.request({
-            url: 'http://127.0.0.1:8000/searchEngine/',
+            url: 'http://62.234.50.47/searchEngine/',
             data: postData,
             method: 'POST',
             header: {
