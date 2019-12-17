@@ -97,7 +97,7 @@ Page({
   },
 
   info: function(e) {
-    var tmp = '/pages/activity-details/activity-details?' + 'id=' + e.currentTarget.dataset.id
+    var tmp = '/pages/ticket/ticket?' + 'id=' + e.currentTarget.dataset.id
     wx.navigateTo({
       url: tmp,
     })

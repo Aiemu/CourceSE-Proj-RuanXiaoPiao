@@ -33,6 +33,7 @@
     }]
   },
   "sitemapLocation": "sitemap.json",
+  "navigateToMiniProgramAppIdList": ["wx1ebe3b2266f4afe0"],
   "usingComponents": {
   }
 }

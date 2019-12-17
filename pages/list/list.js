@@ -44,11 +44,14 @@ Page({
                                   //回调处理
                                   console.log('getOpenID-OK!');
                                   console.log(res.data);
+
+                                  //TODO: sessionid
                               },
                               fail: function (error) {
                                   console.log(error);
                               }
                           })
+                console.log("success!")
                       },
                       fail: function () {
                           console('登录获取Code失败！');
@@ -63,7 +66,6 @@ Page({
                 })
               }
             }
-
         })
     },
     getUserInfo: function (e) {
@@ -73,24 +75,27 @@ Page({
           // 获取到用户的信息了，打印到控制台上看下
           console.log("用户的信息如下：");
           console.log(e.detail.userInfo);
+          
           //授权成功后,通过改变 isHide 的值，让实现页面显示出来，把授权页面隐藏起来
           that.setData({
             isHide: false
-          });
-        } else {
-          //用户按了拒绝按钮
-          wx.showModal({
-            title: '警告',
-            content: '您点击了拒绝授权，将无法进入小程序，请授权之后再进入!!!',
-            showCancel: false,
-            confirmText: '返回授权',
-            success: function (res) {
-              // 用户没有授权成功，不需要改变 isHide 的值
-              if (res.confirm) {
-                console.log('用户点击了“返回授权”');
-              }
-            }
           })
+          this.onLoad()
+        } else {
+          // //用户按了拒绝按钮
+          // wx.showModal({
+          //   title: '警告',
+          //   content: '您点击了拒绝授权，将无法进入小程序，请授权之后再进入!!!',
+          //   showCancel: false,
+          //   confirmText: '返回授权',
+          //   success: function (res) {
+          //     // 用户没有授权成功，不需要改变 isHide 的值
+          //     if (res.confirm) {
+          //       console.log('用户点击了“返回授权”');
+          //     }
+          //   }
+          // }
+          // )
         }
     },
     getBanners: function () {
@@ -100,27 +105,6 @@ Page({
     },
     //获取活动列表
     getActivityList: function () {
-        // //TODO: 改成服务器请求获取活动列表
-        // this.activityList = [{
-        //     id: 0,
-        //     image: 'https://img.yzcdn.cn/vant/cat.jpeg',
-        //     title: '软件学院学生节',
-        //     date: '2020.04.20',
-        //     location: '大礼堂',
-        //     sponsor: '软院学生会主办',
-        //     state: 0,
-        //     hot: 500
-        // },
-        // {
-        //     id: 1,
-        //     image: 'https://img.yzcdn.cn/vant/cat.jpeg',
-        //     title: '软件学院学生节2',
-        //     date: '2020.04.20',
-        //     location: '大礼堂',
-        //     sponsor: '软院学生会主办',
-        //     state: 0,
-        //     hot: 500
-        // },]
         let list = []
         let that = this
         var postData = {

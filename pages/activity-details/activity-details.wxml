@@ -19,12 +19,12 @@
     <text class="sponsor">{{activityDetail.basicInfo.publisher}}</text>
 </view>
 <view class="buttons">
-    <van-row gutter="30">
+    <van-row>
         <van-col span="12" bindtap="tapCollect">
             <van-button wx:if="{{collected}}" plain hairline type="primary" size="large">已关注</van-button>
             <van-button wx:else plain hairline type="primary" size="large">关注</van-button>
         </van-col>
-        <van-col span="12"><van-button plain hairline type="primary" size="large">分享</van-button></van-col>
+        <van-col span="12"><van-button plain hairline type="primary" size="large" open-type="share">分享</van-button></van-col>
     </van-row>
 </view>
 

@@ -5,17 +5,14 @@ Page({
    * 页面的初始数据
    */
   data: {
-    is_verify: true,
+    is_verify: false,
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    //从后端抓取用户基本信息
-    this.setData({
-      
-    })
+    
   },
 
   /**
@@ -29,7 +26,12 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    console.log(getApp().globalData.verifyToken)
+    if(getApp().globalData.verifyToken != 0) {
+      this.setData({
+        is_verify: true
+      })
+    }
   },
 
   /**

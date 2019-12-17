@@ -132,6 +132,17 @@ Page({
             }
         })
     },
+    onShareAppMessage: function (res) {
+        if (res.from === 'button') {
+        }
+        return {
+            title: '分享',
+            path: '/pages/activity-details/activity-details?id=' + this.activityId,
+            success: function (res) {
+                console.log('成功', res)
+            }
+        }
+    },
     onClickTicketing(e) {
         // 看是否是多长次或需要支付
         // 不是，则直接弹出对话框确认购买
