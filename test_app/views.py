@@ -29,9 +29,18 @@ from .serializers import UserSerializer
 appid = 'wx7d93bbb34a8d3662'
 appsecret = '4acadab52b5a08cd3166d4743c39f3f8'
 
+
+
+'''
+Part 0
+Intro: Function to init
+Num: 1
+List: 
+    - init(request)
+'''
+
 @api_view(['POST'])
 
-# from code to session
 def init(request):
     # code & userinfo
     js_code = request.POST.get('code')
@@ -70,34 +79,51 @@ def init(request):
     ret['msg'] = '授权成功'
     ret['data'] = {
         'jwt': jwt,
-        'user_openid': user.openid,
+        'openid': user.openid,
         'nickname': user.username
     }
     return JsonResponse(ret)
 
-# 现在getList会在返回活动列表的同时检测这些活动是否结束或者无票
+
+
+'''
+Part 1
+Intro: Functions to operate activity
+Num: 4
+List: 
+    - getActivityList(request)
+    - getScrollActivity(request)
+    - getActivityInfo(request)
+    - searchEngine(request)
+'''
+
 def getActivityList(request):
-    # 重写json序列化类，特判datetime类型（这个类不可写在函数外，否则将引起特殊问题）
+    # encode date
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, datetime.datetime):
                 return obj.strftime("%Y-%m-%d %H:%M:%S")
-            # elif isinstance(obj, date):
-            #     return obj.strftime("%Y-%m-%d")
             else:
                 return json.JSONEncoder.default(self, obj)
     
+    # get list
     actList = Activity.objects.all()
     retList = []
+
     for item in actList:
         # update status
         current_time = datetime.datetime.now()
+
         if item.time <= current_time:
             item.status = u'已结束'
             item.heat = item.min_heat
         elif item.remain <= 0:
             item.status = u'已售空'
-        item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
+        
+        # save
+        item.save() 
+
+        # create json
         i = {
             'activity_id': item.activity_id, 
             'title': item.title, 
@@ -111,6 +137,7 @@ def getActivityList(request):
             'price': item.price,
             'heat': item.heat,
         }
+
         iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
         retList.append(iJson)
     
@@ -122,157 +149,8 @@ def getActivityList(request):
     }
     return JsonResponse(ret)
 
-def purchaseTicket(request):
-    # code & userinfo
-    js_code = request.POST.get('code')
-    activity_id = request.POST.get('activity_id')
-
-    # get openid
-    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
-    response = json.loads(requests.get(url).content)
-    
-    # if fail
-    if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
-
-    # openid & session_key
-    openid = response['openid']
-    session_key = response['session_key']
-    
-    # get user & activity
-    try: 
-        user = User.objects.get(openid = openid)
-        activity = Activity.objects.get(activity_id = activity_id)
-    except:
-        ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '购票失败，用户或活动不存在'
-        ret['data'] = {
-            'code': js_code,
-            'openid': openid,
-            'activity_id': activity_id,
-        }
-        return JsonResponse(ret)
-
-    # is remain?
-    if activity.remain <= 0:
-        ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '购票失败，余票不足'
-        ret['data'] = {
-            'user': user.username,
-            'activity_id': activity_id,
-            'remain': activity.remain,
-        }
-        return JsonResponse(ret)
-    else:
-        try:
-            ticket = Ticket.objects.filter(owner = user)
-            # print(ticket)
-            for i in ticket:
-                # print('owner:', i.owner.user_id, 'act:', i.activity.activity_id)
-                if i.activity == activity and i.is_valid:
-                    ret = {'code': '102', 'msg': None,'data':{}}
-                    ret['msg'] = '购票失败，票已存在'
-                    ret['data'] = {
-                        'user_id': user.user_id,
-                        'user': user.username,
-                        'activity_id': activity.activity_id,
-                        'remain': activity.remain,
-                    }
-                    return JsonResponse(ret)
-        except:
-            pass
-
-        # activity changes
-        activity.remain -= 1 # decrease remain
-        activity.heat += activity.purchase_change
-        activity.save()
-
-        # ticket changes
-        ticket = Ticket(owner = user, activity = activity) # new ticket
-        ticket.is_valid = True # varify
-        ticket.save()
-        
-        # ret msg
-        ret = {'code': '002', 'msg': None,'data':{}}
-        ret['msg'] = '购票成功'
-        ret['data'] = {
-            'user_id': user.user_id,
-            'user': user.username,
-            'activity_id': activity.activity_id,
-            'remain': activity.remain,
-        }
-        return JsonResponse(ret)
-
-def getTicketList(request):
-    # 引用新class
-    class DateEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, datetime.datetime):
-                return obj.strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                return json.JSONEncoder.default(self, obj)
-
-    # code & userinfo
-    js_code = request.POST.get('code')
-
-    # get openid
-    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
-    response = json.loads(requests.get(url).content)
-    
-    # if fail
-    if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
-
-    # openid & session_key
-    openid = response['openid']
-    session_key = response['session_key']
-    
-    # get user
-    try: 
-        user = User.objects.get(openid = openid)
-    except:
-        ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '获取已购票列表失败，用户不存在'
-        ret['data'] = {
-            'code': js_code,
-            'openid': openid,
-        }
-        return JsonResponse(ret)
-
-    # get user's tickets
-    ticList = user.ticket_set.all()
-    # print(ticList[0].activity.activity_id)
-
-    # get retList
-    retList = []
-    for item in ticList:
-        i = {
-            'ticket_id': item.ticket_id,
-            # 'owner': item.owner.username, 
-            'ticket_status': item.is_valid,
-            'activity_status': item.activity.status,
-            'activity_image': 'http://62.234.50.47' + item.activity.image.url,
-            # 'activity_id': item.activity.activity_id,
-            'title': item.activity.title,
-            'time': item.activity.time,
-            'place': item.activity.place,
-            'price': item.activity.price,
-            'heat': item.activity.heat,
-        }
-        iJson = json.dumps(i, cls = DateEncoder)
-        retList.append(iJson)
-
-    # ret msg
-    ret = {'code': '003', 'msg': None,'data':{}}
-    ret['msg'] = '获取已购票列表成功'
-    ret['data'] = {
-        'user': user.username,
-        'ticketList': retList,
-    }
-    return JsonResponse(ret)
-
 def getActivityInfo(request):
-    # code & userinfo
+    # get activity_id
     activity_id = request.POST.get('activity_id')
 
     # get user & activity
@@ -308,99 +186,47 @@ def getActivityInfo(request):
     }
     return JsonResponse(ret)
 
-def getTicketInfo(request):
-    # code & userinfo
-    ticket_id = request.POST.get('ticket_id')
-
-    # get user & activity
-    try:
-        ticket = Ticket.objects.get(ticket_id = ticket_id)
-    except:
-        ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '获取票详情失败，票不存在'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-        }
-        return JsonResponse(ret)
-
+def getScrollActivity(request):
+    # 重写json序列化类，特判datetime类型（这个类不可写在函数外，否则将引起特殊问题）
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            # elif isinstance(obj, date):
+            #     return obj.strftime("%Y-%m-%d")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    actList = Activity.objects.filter(status = '正在抢票').order_by('-heat')
+    retList = []
+    count = 0
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
+        if count < 5:
+            i = {
+                'activity_id': item.activity_id, 
+                'image': 'http://62.234.50.47' + item.image.url,
+                'heat': item.heat,
+            }
+            iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+            retList.append(iJson)
+            count += 1
+        else:
+            break
+    
     # ret msg
-    ret = {'code': '005', 'msg': None,'data':{}}
-    ret['msg'] = '票详情获取成功'
+    ret = {'code': '001', 'msg': None,'data':{}}
+    ret['msg'] = '获取活动列表成功'
     ret['data'] = {
-        'ticket_id': ticket_id,
-        'owner': ticket.owner.username,
-        'title': ticket.activity.title,
-        'price': ticket.activity.price,
-        'place': ticket.activity.place,
-        'heat': ticket.activity.heat,
-        'tic_time': ticket.purchaseTime,
-        'act_time': ticket.activity.time,
-        'is_valid': ticket.is_valid,
-        # 'QRCode': ticket.QRCode,
+        'activityList': retList,
     }
-    return JsonResponse(ret)
-
-# 已修复，现在对于已经is_valid = False的票，不会重复退票
-def refundTicket(request):
-    # code & userinfo
-    js_code = request.POST.get('code')
-    ticket_id = request.POST.get('ticket_id')
-
-    # get openid
-    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
-    response = json.loads(requests.get(url).content)
-    
-    # if fail
-    if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
-
-    # openid & session_key
-    openid = response['openid']
-    session_key = response['session_key']
-    
-    # get user & activity
-    try: 
-        user = User.objects.get(openid = openid)
-        ticket = Ticket.objects.get(ticket_id = ticket_id)
-        activity = ticket.activity
-    except: 
-        ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '退票失败，用户或此票不存在'
-        ret['data'] = {
-            'code': js_code,
-            'openid': openid,
-            'ticket_id': ticket_id,
-        }
-        return JsonResponse(ret)
-
-    # 判断ticket的is_valid，仅为True时才可退票
-    if ticket.is_valid:
-        # activity changes
-        activity.remain += 1
-        activity.heat -= activity.purchase_change
-        activity.save()
-
-        # ticket changes
-        ticket.is_valid = False # unvarify
-        ticket.save()
-
-        # user changes ?
-
-        # ret msg
-        ret = {'code': '006', 'msg': None,'data':{}}
-        ret['msg'] = '退票成功'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-            'unvarify': ticket.is_valid,
-        }
-    else:
-        # ret msg
-        ret = {'code': '006', 'msg': None,'data':{}}
-        ret['msg'] = '退票失败'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-            'unvarify': ticket.is_valid,
-        }
     return JsonResponse(ret)
 
 def searchEngine(request):
@@ -472,36 +298,291 @@ def searchEngine(request):
     }
     return JsonResponse(ret)
 
-def starActivity(request):
-    # code & userinfo
-    js_code = request.POST.get('code')
+
+
+'''
+Part 2
+Intro: Functions to operate ticket
+Num: 4
+List: 
+    - purchaseTicket(request)
+    - refundTicket(request)
+    - getTicketList(request)
+    - getTicketInfo(request)
+'''
+
+def purchaseTicket(request):
+    # get openid & activity_id
+    openid = request.POST.get('openid')
     activity_id = request.POST.get('activity_id')
-
-    # get openid
-    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
-    response = json.loads(requests.get(url).content)
-    
-    # if fail
-    if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
-
-    # openid & session_key
-    openid = response['openid']
-    session_key = response['session_key']
     
     # get user & activity
     try: 
         user = User.objects.get(openid = openid)
-        activity = Activity.objects.get(activity_id = activity_id)
     except:
         ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '收藏失败，用户或活动不存在'
+        ret['msg'] = '购票失败，该用户不存在'
         ret['data'] = {
-            'code': js_code,
             'openid': openid,
             'activity_id': activity_id,
         }
         return JsonResponse(ret)
+
+    # get activity
+    try: 
+        activity = Activity.objects.get(activity_id = activity_id)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '购票失败，该活动不存在'
+        ret['data'] = {
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+    # check remain
+    if activity.remain <= 0:
+        # ret msg
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '购票失败，余票不足'
+        ret['data'] = {
+            'user': user.username,
+            'activity_id': activity_id,
+            'remain': activity.remain,
+        }
+        return JsonResponse(ret)
+    else:
+        try:
+            # get user's ticket
+            ticket = Ticket.objects.filter(owner = user)
+
+            for i in ticket:
+                # check is_valid
+                if i.activity == activity and i.is_valid:
+                    #ret msg
+                    ret = {'code': '102', 'msg': None,'data':{}}
+                    ret['msg'] = '购票失败，票已存在'
+                    ret['data'] = {
+                        'user_id': user.user_id,
+                        'user': user.username,
+                        'activity_id': activity.activity_id,
+                        'remain': activity.remain,
+                    }
+                    return JsonResponse(ret)
+        except:
+            pass
+
+        # update activity's remain, heat
+        activity.remain -= 1
+        activity.heat += activity.purchase_change
+
+        # save activity
+        activity.save()
+
+        # create new ticket
+        ticket = Ticket(owner = user, activity = activity)
+        
+        # varify ticket
+        ticket.is_valid = True 
+
+        # save ticket
+        ticket.save()
+        
+        # ret msg
+        ret = {'code': '002', 'msg': None,'data':{}}
+        ret['msg'] = '购票成功'
+        ret['data'] = {
+            'user_id': user.user_id,
+            'user': user.username,
+            'activity_id': activity.activity_id,
+            'remain': activity.remain,
+        }
+        return JsonResponse(ret)
+
+def refundTicket(request):
+    # get ticket_id
+    ticket_id = request.POST.get('ticket_id')
+
+    # get activity
+    try: 
+        ticket = Ticket.objects.get(ticket_id = ticket_id)
+        activity = ticket.activity
+    except: 
+        # ret msg
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '退票失败，该票不存在'
+        ret['data'] = {
+            'openid': openid,
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
+
+    # check is_valid
+    if ticket.is_valid:
+        # update activity's remain & heat
+        activity.remain += 1
+        activity.heat -= activity.purchase_change
+
+        # save
+        activity.save()
+
+        # update ticket's is_valid
+        ticket.is_valid = False
+
+        # save
+        ticket.save()
+
+        # ret msg
+        ret = {'code': '006', 'msg': None,'data':{}}
+        ret['msg'] = '退票成功'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+            'is_valid': ticket.is_valid,
+        }
+
+    else:
+        # ret msg
+        ret = {'code': '006', 'msg': None,'data':{}}
+        ret['msg'] = '退票失败，该票已为退票状态'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+            'is_valid': ticket.is_valid,
+        }
+    return JsonResponse(ret)
+
+def getTicketList(request):
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+
+    # get openid
+    openid = request.POST.get('openid')
+
+    # get user
+    try: 
+        user = User.objects.get(openid = openid)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '获取已购票列表失败，用户不存在'
+        ret['data'] = {
+            # 'code': js_code,
+            'openid': openid,
+        }
+        return JsonResponse(ret)
+
+    # get user's tickets
+    ticList = user.ticket_set.all()
+
+    # get retList
+    retList = []
+    for item in ticList:
+        # create json
+        i = {
+            'ticket_id': item.ticket_id,
+            # 'owner': item.owner.username, 
+            'ticket_status': item.is_valid,
+            'activity_status': item.activity.status,
+            'activity_image': 'http://62.234.50.47' + item.activity.image.url,
+            # 'activity_id': item.activity.activity_id,
+            'title': item.activity.title,
+            'time': item.activity.time,
+            'place': item.activity.place,
+            'price': item.activity.price,
+            'heat': item.activity.heat,
+        }
+        iJson = json.dumps(i, cls = DateEncoder)
+        retList.append(iJson)
+
+    # ret msg
+    ret = {'code': '003', 'msg': None,'data':{}}
+    ret['msg'] = '获取已购票列表成功'
+    ret['data'] = {
+        'openid': openid,
+        'ticketList': retList,
+    }
+    return JsonResponse(ret)
+
+def getTicketInfo(request):
+    # get ticket_id
+    ticket_id = request.POST.get('ticket_id')
+
+    # get ticket
+    try:
+        ticket = Ticket.objects.get(ticket_id = ticket_id)
+    except:
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '获取票详情失败，票不存在'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
+
+    # ret msg
+    ret = {'code': '005', 'msg': None,'data':{}}
+    ret['msg'] = '票详情获取成功'
+    ret['data'] = {
+        'ticket_id': ticket_id,
+        'owner': ticket.owner.username,
+        'title': ticket.activity.title,
+        'price': ticket.activity.price,
+        'place': ticket.activity.place,
+        'heat': ticket.activity.heat,
+        'tic_time': ticket.purchaseTime,
+        'act_time': ticket.activity.time,
+        'is_valid': ticket.is_valid,
+        # 'QRCode': ticket.QRCode,
+    }
+    return JsonResponse(ret)
+
+
+
+'''
+Part 3
+Intro: Functions to operate star
+Num: 3
+List: 
+    - starActivity(request)
+    - deleteStar(request)
+    - deleteStar(request)
+'''
+
+def starActivity(request):
+    # get openid & activity_id
+    openid = request.POST.get('openid')
+    activity_id = request.POST.get('activity_id')
+    
+    # get user
+    try: 
+        user = User.objects.get(openid = openid)
+
+    except:
+        # ret msg
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '收藏失败，该用户不存在'
+        ret['data'] = {
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+    # get activity
+    try: 
+        activity = Activity.objects.get(activity_id = activity_id)
+
+    except:
+        # ret msg
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '收藏失败，该活动不存在'
+        ret['data'] = {
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
 
     # star
     user.starred.add(activity)
@@ -521,42 +602,29 @@ def starActivity(request):
     return JsonResponse(ret)
 
 def getStarList(request):
-    # code & userinfo
-    js_code = request.POST.get('code')
-    
     # get openid
-    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
-    response = json.loads(requests.get(url).content)
+    openid = request.POST.get('openid')
     
-    # if fail
-    if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
-
-    # openid & session_key
-    openid = response['openid']
-    session_key = response['session_key']
-    
-    # get user & activity
+    # get user
     try: 
         user = User.objects.get(openid = openid)
     except:
         ret = {'code': '102', 'msg': None,'data':{}}
         ret['msg'] = '获取收藏列表失败，该用户不存在'
         ret['data'] = {
-            'code': js_code,
             'openid': openid,
         }
         return JsonResponse(ret)
 
+    # encode date
     class DateEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, datetime.datetime):
                 return obj.strftime("%Y-%m-%d %H:%M:%S")
-            # elif isinstance(obj, date):
-            #     return obj.strftime("%Y-%m-%d")
             else:
                 return json.JSONEncoder.default(self, obj)
     
+    # get star list
     actList = user.starred.all()
     retList = []
     for item in actList:
@@ -567,7 +635,11 @@ def getStarList(request):
             item.heat = item.min_heat
         elif item.remain <= 0:
             item.status = u'已售空'
-        item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
+
+        # save
+        item.save()
+
+        # create json
         i = {
             'activity_id': item.activity_id, 
             'title': item.title, 
@@ -580,6 +652,7 @@ def getStarList(request):
             'place': item.place, 
             'price': item.price
         }
+
         iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
         retList.append(iJson)
     
@@ -592,31 +665,31 @@ def getStarList(request):
     return JsonResponse(ret)
 
 def deleteStar(request):
-    # code & userinfo
-    js_code = request.POST.get('code')
+    # get openid & activity_id
+    openid = request.POST.get('openid')
     activity_id = request.POST.get('activity_id')
-
-    # get openid
-    url = 'https://api.weixin.qq.com/sns/jscode2session' + '?appid=' + appid + '&secret=' + appsecret + '&js_code=' + js_code + '&grant_type=authorization_code'
-    response = json.loads(requests.get(url).content)
     
-    # if fail
-    if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
-
-    # openid & session_key
-    openid = response['openid']
-    session_key = response['session_key']
-    
-    # get user & activity
+    # get user
     try: 
         user = User.objects.get(openid = openid)
-        activity = Activity.objects.get(activity_id = activity_id)
+
     except: 
         ret = {'code': '102', 'msg': None,'data':{}}
-        ret['msg'] = '取消收藏失败，该用户或活动不存在'
+        ret['msg'] = '取消收藏失败，该用户不存在'
         ret['data'] = {
-            'code': js_code,
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+    # get user & activity
+    try: 
+        activity = Activity.objects.get(activity_id = activity_id)
+
+    except: 
+        ret = {'code': '102', 'msg': None,'data':{}}
+        ret['msg'] = '取消收藏失败，该活动不存在'
+        ret['data'] = {
             'openid': openid,
             'activity_id': activity_id,
         }
@@ -638,6 +711,16 @@ def deleteStar(request):
         'activity': activity.activity_id,
     }
     return JsonResponse(ret)
+
+
+
+'''
+Part 3
+Intro: Functions to save test data
+Num: 1
+List: 
+    - saveTestData(request)
+'''
 
 # 初始化测试数据库
 def saveTestData(request):
@@ -688,6 +771,16 @@ def saveTestData(request):
         # 'newTicket': ticket.ticket_id,
     }
     return JsonResponse(ret)
+
+
+
+'''
+Part 4
+Intro: Function to show page for testing net connect
+Num: 1
+List: 
+    - index(request)
+'''
 
 def index(request):
     return HttpResponse("Hello! You are at the index page of test_app.")

@@ -1,5 +1,6 @@
 <view>
     <button bindtap="getActivityList">获取活动列表</button>
+    <button bindtap="getScrollActivity">获取滚图</button>
     <button bindtap="getActivityInfo">获取活动详情</button>
     <button open-type="getUserInfo" bindgetuserinfo="purchaseTicket">购票</button>
     <button open-type="getUserInfo" bindgetuserinfo="starActivity">收藏</button>
