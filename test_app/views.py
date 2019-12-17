@@ -637,6 +637,50 @@ def deleteStar(request):
     }
     return JsonResponse(ret)
 
+def getScrollActivity(request):
+    # 重写json序列化类，特判datetime类型（这个类不可写在函数外，否则将引起特殊问题）
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            # elif isinstance(obj, date):
+            #     return obj.strftime("%Y-%m-%d")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    actList = Activity.objects.filter(status = '正在抢票').order_by('-heat')
+    retList = []
+    count = 0
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        item.save() # WARNING : 修改后必须save()一下，否则数据库中的数据不会发生变化
+        if count < 5:
+            i = {
+                'activity_id': item.activity_id, 
+                'image': 'http://62.234.50.47' + item.image.url,
+                'heat': item.heat,
+            }
+            iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+            retList.append(iJson)
+            count += 1
+        else:
+            break
+    
+    # ret msg
+    ret = {'code': '001', 'msg': None,'data':{}}
+    ret['msg'] = '获取活动列表成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)
+
+
 # 初始化测试数据库
 def saveTestData(request):
     # test data for user

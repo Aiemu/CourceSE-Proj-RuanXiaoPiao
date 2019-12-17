@@ -35,5 +35,6 @@ urlpatterns = [
     path('starActivity/', views.starActivity), # 收藏
     path('deleteStar/', views.deleteStar), # 取消收藏
     path('getStarList/', views.getStarList), # 获取收藏列表
+    path('getScrollActivity/', views.getScrollActivity), # 获取滚图活动
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

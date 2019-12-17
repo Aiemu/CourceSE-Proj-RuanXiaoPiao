@@ -4,7 +4,8 @@ Page({
             str: 'get list'
         };
         wx.request({
-            url: 'http://62.234.50.47/getActivityList/',
+            // url: 'http://62.234.50.47/getScrollActivity/',
+            url: 'http://127.0.0.1:8000/getActivityList/',
             data: postData,
             method: 'POST',
             header: {
@@ -12,6 +13,28 @@ Page({
             },
             success: function (res) {
                 console.log('getList-OK!');
+                console.log(res.data);
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
+    },
+
+    getScrollActivity: function () {
+        var postData = {
+            str: 'get list'
+        };
+        wx.request({
+            // url: 'http://62.234.50.47/getScrollActivity/',
+            url: 'http://127.0.0.1:8000/getScrollActivity/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                console.log('getScroll-OK!');
                 console.log(res.data);
             },
             fail: function (error) {
