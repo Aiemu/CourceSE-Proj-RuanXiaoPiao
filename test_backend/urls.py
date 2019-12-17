@@ -36,4 +36,8 @@ urlpatterns = [
     path('deleteStar/', views.deleteStar), # 取消收藏
     path('getStarList/', views.getStarList), # 获取收藏列表
 
+    # 产生二维码的测试
+    path('testQRCode/', views.testQRCode),
+    path('logo/', views.logo),
+
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
