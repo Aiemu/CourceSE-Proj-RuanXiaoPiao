@@ -781,4 +781,4 @@ List:
 '''
 
 def index(request):
-    return HttpResponse("Hello! You are at the index page of test_app.")
+    return HttpResponse("Hello! You are at the index page.")
