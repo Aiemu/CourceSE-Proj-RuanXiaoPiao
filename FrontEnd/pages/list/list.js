@@ -4,7 +4,7 @@ Page({
             str: 'get list'
         };
         wx.request({
-            url: 'http://62.234.50.47/getScrollActivity/',
+            url: 'http://62.234.50.47/getActivityList/',
             // url: 'http://127.0.0.1:8000/getActivityList/',
             data: postData,
             method: 'POST',
