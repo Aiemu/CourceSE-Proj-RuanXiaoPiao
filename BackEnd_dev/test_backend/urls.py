@@ -60,5 +60,7 @@ urlpatterns = [
     # Part 6: admin
     path('admin/', admin.site.urls), # 管理 60
 
+    path('random/', views.randomStr),
+
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -12,6 +12,8 @@ import datetime
 import jieba
 import re
 import qrcode
+import random
+import string
 
 # from django.conf import settings
 from PIL import Image
@@ -501,15 +503,19 @@ def purchaseTicket(request):
         # verify ticket
         ticket.is_valid = True
 
-        # create a QRCode
+        # define QRCode mode
         qr = qrcode.QRCode(
             version=5,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=8,
             border=4,
         )
-        # url = str(ticket.ticket_id)
-        url = str(user.user_id) + " + " + str(activity.activity_id)
+        # get random mark as part of the url
+        letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+        url = "RuanXiaoPiao_Unique: "
+        for i in range(3):
+            url = url + random.choice(letters) + " + "
+        url = url + str(user.user_id) + " + " + str(activity.activity_id)
         qr.add_data(url)
         qr.make(fit=True)
         img = qr.make_image()
@@ -530,10 +536,8 @@ def purchaseTicket(request):
         icon = icon.convert("RGBA")
         img.paste(icon, (w, h), icon)
 
-        img.save('media/QR/' + str(ticket.ticket_id) +'.png')
-        ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
-        # img.save('media/QR/newQR.png')
-        # ticket.QRCode = 'QR/newQR.png'
+        img.save('media/QR/' + str(user.user_id) + '_' + str(activity.activity_id) +'.png')
+        ticket.QRCode = 'QR/' + str(user.user_id) + '_' + str(activity.activity_id) +'.png'
 
         # save ticket
         ticket.save()
@@ -1063,3 +1067,10 @@ def index(request):
         None
     '''
     return HttpResponse("060\nHello! You are at the index page")
+
+def randomStr(request):
+    letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    randomString = ''
+    for i in range(5):
+        randomString = randomString + random.choice(letters)
+    return HttpResponse(randomString)
