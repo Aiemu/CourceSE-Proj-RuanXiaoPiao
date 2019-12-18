@@ -51,9 +51,9 @@ urlpatterns = [
     path('deleteStar/', views.deleteStar), # 取消收藏 31
     path('getStarList/', views.getStarList), # 获取收藏列表 32
 
-    # Part 4: QRCode
-    path('testQRCode/', views.testQRCode), # 测试二维码 40
-    path('logo/', views.logo), # 添加二维码logo 41
+    # # Part 4: QRCode
+    # path('testQRCode/', views.testQRCode), # 测试二维码 40
+    # path('logo/', views.logo), # 添加二维码logo 41
 
     # Part 5: save test data
     path('saveTestData/', views.saveTestData), # 存入测试数据 50

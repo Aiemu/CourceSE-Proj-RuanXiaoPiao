@@ -499,7 +499,10 @@ def purchaseTicket(request):
         ticket = Ticket(owner = user, activity = activity)
         
         # verify ticket
-        ticket.is_valid = True 
+        ticket.is_valid = True
+
+        # create a QRCode
+        getlogoQRCode(ticket.ticket_id) 
 
         # save ticket
         ticket.save()
@@ -958,7 +961,39 @@ List:
     - logo(request)
 '''
 
-def testQRCode(request): 
+# def testQRCode(request): 
+#     '''
+#     Intro: 
+        
+#     Args(request): 
+        
+#     Returns: 
+#         {code: , msg: , data: {}}
+#     '''
+#     test_ticket = Ticket.objects.get(ticket_id = 20)
+
+#     # create new QRCode
+#     qr = qrcode.QRCode(
+#         version=None,
+#         error_correction=qrcode.constants.ERROR_CORRECT_L,
+#         box_size=10,
+#         border=2,
+#     )
+#     url='another_test_qrcode'
+#     qr.add_data(url)
+#     qr.make(fit=True)
+#     img = qr.make_image()
+#     img.save('media/QR/test_qrcode.png')
+#     test_ticket.QRCode = 'QR/test_qrcode.png'
+#     test_ticket.save()
+#     '''
+#     ERROR_CORRECT_L: 大约7%或更少的错误能被纠正
+#     ERROR_CORRECT_M:（默认）大约15%或更少的错误能被纠正
+#     ROR_CORRECT_H:大约30%或更少的错误能被纠正
+#     '''
+#     return HttpResponse(test_ticket.QRCode.url)
+
+def getlogoQRCode(id): 
     '''
     Intro: 
         
@@ -967,39 +1002,7 @@ def testQRCode(request):
     Returns: 
         {code: , msg: , data: {}}
     '''
-    test_ticket = Ticket.objects.get(ticket_id = 20)
-
-    # create new QRCode
-    qr = qrcode.QRCode(
-        version=None,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=2,
-    )
-    url='another_test_qrcode'
-    qr.add_data(url)
-    qr.make(fit=True)
-    img = qr.make_image()
-    img.save('media/QR/test_qrcode.png')
-    test_ticket.QRCode = 'QR/test_qrcode.png'
-    test_ticket.save()
-    '''
-    ERROR_CORRECT_L: 大约7%或更少的错误能被纠正
-    ERROR_CORRECT_M:（默认）大约15%或更少的错误能被纠正
-    ROR_CORRECT_H:大约30%或更少的错误能被纠正
-    '''
-    return HttpResponse(test_ticket.QRCode.url)
-
-def logo(request): 
-    '''
-    Intro: 
-        
-    Args(request): 
-        
-    Returns: 
-        {code: , msg: , data: {}}
-    '''
-    test_ticket = Ticket.objects.get(ticket_id = 20)
+    test_ticket = Ticket.objects.get(ticket_id = id)
     # create new QRCode
     qr = qrcode.QRCode(
         version=5,
@@ -1007,7 +1010,7 @@ def logo(request):
         box_size=8,
         border=4,
     )
-    url='logo_qrcode'
+    url=str(id)
     qr.add_data(url)
     qr.make(fit=True)
     img = qr.make_image()
@@ -1028,11 +1031,11 @@ def logo(request):
     icon = icon.convert("RGBA")
     img.paste(icon, (w, h), icon)
 
-    img.save('media/QR/test_qrcode.png')
-    test_ticket.QRCode = 'QR/test_qrcode.png'
+    img.save('media/QR/' + str(id) +'.png')
+    test_ticket.QRCode = 'QR/' + str(id) +'.png'
     test_ticket.save()
 
-    return HttpResponse(test_ticket.QRCode.url)
+    # return HttpResponse(test_ticket.QRCode.url)
 
 
 
