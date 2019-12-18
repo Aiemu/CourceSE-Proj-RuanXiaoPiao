@@ -53,7 +53,7 @@ urlpatterns = [
 
     # # Part 4: QRCode
     # path('testQRCode/', views.testQRCode), # 测试二维码 40
-    # path('logo/', views.logo), # 添加二维码logo 41
+    path('logo/', views.logo), # 添加二维码logo 41
 
     # Part 5: save test data
     path('saveTestData/', views.saveTestData), # 存入测试数据 50

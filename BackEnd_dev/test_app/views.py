@@ -502,7 +502,6 @@ def purchaseTicket(request):
         ticket.is_valid = True
 
         # create a QRCode
-        # getlogoQRCode(ticket.ticket_id)
         qr = qrcode.QRCode(
             version=5,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -510,7 +509,7 @@ def purchaseTicket(request):
             border=4,
         )
         # url = str(ticket.ticket_id)
-        url = 'Can you fetch the QRCode please?'
+        url = str(user.user_id) + " + " + str(activity.activity_id)
         qr.add_data(url)
         qr.make(fit=True)
         img = qr.make_image()
@@ -531,10 +530,10 @@ def purchaseTicket(request):
         icon = icon.convert("RGBA")
         img.paste(icon, (w, h), icon)
 
-        img.save('media/QR/ohmygod.png')
-        ticket.QRCode = 'QR/ohmygod.png'
         # img.save('media/QR/' + str(ticket.ticket_id) +'.png')
         # ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
+        img.save('media/QR/newQR.png')
+        ticket.QRCode = 'QR/newQR.png'
 
         # save ticket
         ticket.save()
@@ -1025,7 +1024,7 @@ List:
 #     '''
 #     return HttpResponse(test_ticket.QRCode.url)
 
-def getlogoQRCode(id): 
+def logo(request): 
     '''
     Intro: 
         
@@ -1034,7 +1033,7 @@ def getlogoQRCode(id):
     Returns: 
         {code: , msg: , data: {}}
     '''
-    test_ticket = Ticket.objects.get(ticket_id = id)
+    test_ticket = Ticket.objects.get(ticket_id = 21)
     # create new QRCode
     qr = qrcode.QRCode(
         version=5,
@@ -1042,7 +1041,8 @@ def getlogoQRCode(id):
         box_size=8,
         border=4,
     )
-    url=str(id)
+    # url=str(id)
+    url=str(21)
     qr.add_data(url)
     qr.make(fit=True)
     img = qr.make_image()
@@ -1057,17 +1057,17 @@ def getlogoQRCode(id):
         icon_w = size_w
     if icon_h > size_h:
         icon_h = size_h
-    icon = icon.resize((icon_w,icon_h),Image.ANTIALIAS)
+    icon = icon.resize((icon_w, icon_h),Image.ANTIALIAS)
     w = int((img_w - icon_w) / 2)
     h = int((img_h - icon_h) / 2)
     icon = icon.convert("RGBA")
     img.paste(icon, (w, h), icon)
 
-    img.save('media/QR/' + str(id) +'.png')
-    test_ticket.QRCode = 'QR/' + str(id) +'.png'
+    img.save('media/QR/' + str(21) +'.png')
+    test_ticket.QRCode = 'QR/' + str(21) +'.png'
     test_ticket.save()
 
-    # return HttpResponse(test_ticket.QRCode.url)
+    return HttpResponse(test_ticket.QRCode.url)
 
 
 
