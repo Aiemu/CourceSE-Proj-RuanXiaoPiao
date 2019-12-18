@@ -2,7 +2,6 @@
   "pages": [
     "pages/list/list",
     "pages/home/home",
-    "pages/profile/profile",
     "pages/ticket/ticket",
     "pages/my_order/my_order",
     "pages/my_collect/my_collect",

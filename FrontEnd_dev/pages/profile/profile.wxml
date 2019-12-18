@@ -1,7 +1,0 @@
-<!--pages/profile/profile.wxml-->
-<van-cell-group>
-  <van-cell title="昵称" value="内容" />
-  <van-cell title="性别" value="内容" />
-  <van-cell title="地区" value="内容" />
-  <van-cell title="是否认证" value="内容" />
-</van-cell-group>
