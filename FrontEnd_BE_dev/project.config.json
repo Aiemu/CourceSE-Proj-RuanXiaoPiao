@@ -21,9 +21,15 @@
 		}
 	},
 	"compileType": "miniprogram",
+<<<<<<< HEAD:FrontEnd_BE_dev/project.config.json
 	"libVersion": "2.0.4",
 	"appid": "wx7d93bbb34a8d3662",
 	"projectname": "FrontEnd",
+=======
+	"libVersion": "2.9.4",
+	"appid": "wx7d93bbb34a8d3662",
+	"projectname": "userUI",
+>>>>>>> front-end-dev:FrontEnd_dev/project.config.json
 	"debugOptions": {
 		"hidedInDevtools": []
 	},
