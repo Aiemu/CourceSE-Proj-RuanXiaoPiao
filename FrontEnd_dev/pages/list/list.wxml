@@ -13,7 +13,7 @@
 </view>
 <view>
     <swiper indicator-dots="true" indicator-active-color="#fff" autoplay circular>
-        <swiper-item wx:for="{{banners}}" wx:key="">
+        <swiper-item wx:for="{{banners}}" wx:key="" data-id="{{item.activity_id}}" bindtap="toDetailsTap">
             <van-image width="10rem" height="10rem" fit="contain" src="{{item.image}}"/>
         </swiper-item>
     </swiper>
