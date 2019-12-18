@@ -44,6 +44,7 @@ urlpatterns = [
     path('refundTicket/', views.refundTicket), # 退票 21
     path('getTicketList/', views.getTicketList), # 获取已购票列表 22
     path('getTicketInfo/', views.getTicketInfo), # 获取票的详情 23
+    path('checkTicket/', views.checkTicket), # 检票端检票 24
 
     # Part 3: star
     path('starActivity/', views.starActivity), # 收藏 30

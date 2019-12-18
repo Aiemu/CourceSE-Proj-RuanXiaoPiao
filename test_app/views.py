@@ -679,6 +679,68 @@ def getTicketInfo(request):
     }
     return JsonResponse(ret)
 
+def checkTicket(request): 
+    '''
+    Intro: 
+        check ticket in check-ticket end
+    Args(request): 
+        ticket_id(int)
+    Returns: 
+        {code: 324, msg: 检票失败，该票不存在, data: {ticket_id(int)}}
+        {code: 224, msg: 检票失败，该活动已结束, data: {ticket_id(int)}}
+        {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
+        {code: 024, msg: 检票成功, data: {ticket_id(int)}}
+    '''
+    # get ticket_id
+    ticket_id = request.POST.get('ticket_id')
+
+    # get ticket
+    try: 
+        ticket = Ticket.objects.get(ticket_id = ticket_id)
+
+    except:
+        # ret msg
+        ret = {'code': '324', 'msg': None,'data':{}}
+        ret['msg'] = '检票失败，该票不存在'
+        ret['data'] = {
+            'ticket_id': ticket_id
+        }
+        return JsonResponse(ret)
+
+    # check time
+    if ticket.activity.status == u'已结束': 
+        # ret msg
+        ret = {'code': '224', 'msg': None,'data':{}}
+        ret['msg'] = '检票失败，该活动已结束'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
+
+    # check ticket
+    if ticket.is_checked: 
+        # ret msg
+        ret = {'code': '324', 'msg': None,'data':{}}
+        ret['msg'] = '检票失败，该票已使用'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
+
+    # update
+    ticket.is_checked = True
+
+    # save
+    ticket.save()
+
+    # ret msg
+    ret = {'code': '024', 'msg': None,'data':{}}
+    ret['msg'] = '检票成功'
+    ret['data'] = {
+        'ticket_id': ticket_id, 
+    }
+    return JsonResponse(ret)
+
 
 
 '''

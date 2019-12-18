@@ -72,7 +72,7 @@ Page({
                     // code: data.code,
                     openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
                     // openid: 'testOpenid',
-                    activity_id: 4, // TODO
+                    activity_id: 31, // TODO
                 };
                 wx.request({
                     url: 'http://62.234.50.47/purchaseTicket/',
