@@ -509,7 +509,8 @@ def purchaseTicket(request):
             box_size=8,
             border=4,
         )
-        url = str(ticket.ticket_id)
+        # url = str(ticket.ticket_id)
+        url = 'Can you fetch the QRCode please?'
         qr.add_data(url)
         qr.make(fit=True)
         img = qr.make_image()
@@ -530,8 +531,10 @@ def purchaseTicket(request):
         icon = icon.convert("RGBA")
         img.paste(icon, (w, h), icon)
 
-        img.save('media/QR/' + str(ticket.ticket_id) +'.png')
-        ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
+        img.save('media/QR/ohmygod.png')
+        ticket.QRCode = 'QR/ohmygod.png'
+        # img.save('media/QR/' + str(ticket.ticket_id) +'.png')
+        # ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
 
         # save ticket
         ticket.save()
