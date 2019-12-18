@@ -531,7 +531,7 @@ def purchaseTicket(request):
         img.paste(icon, (w, h), icon)
 
         img.save('media/QR/' + str(ticket.ticket_id) +'.png')
-        test_ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
+        ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
 
         # save ticket
         ticket.save()
