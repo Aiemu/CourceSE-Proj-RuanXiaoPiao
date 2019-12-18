@@ -714,6 +714,68 @@ def getTicketInfo(request):
     }
     return JsonResponse(ret)
 
+def checkTicket(request): 
+    '''
+    Intro: 
+        check ticket in check-ticket end
+    Args(request): 
+        ticket_id(int)
+    Returns: 
+        {code: 324, msg: 检票失败，该票不存在, data: {ticket_id(int)}}
+        {code: 224, msg: 检票失败，该活动已结束, data: {ticket_id(int)}}
+        {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
+        {code: 024, msg: 检票成功, data: {ticket_id(int)}}
+    '''
+    # get ticket_id
+    ticket_id = request.POST.get('ticket_id')
+
+    # get ticket
+    try: 
+        ticket = Ticket.objects.get(ticket_id = ticket_id)
+
+    except:
+        # ret msg
+        ret = {'code': '324', 'msg': None,'data':{}}
+        ret['msg'] = '检票失败，该票不存在'
+        ret['data'] = {
+            'ticket_id': ticket_id
+        }
+        return JsonResponse(ret)
+
+    # check time
+    if ticket.activity.status == u'已结束': 
+        # ret msg
+        ret = {'code': '224', 'msg': None,'data':{}}
+        ret['msg'] = '检票失败，该活动已结束'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
+
+    # check ticket
+    if ticket.is_checked: 
+        # ret msg
+        ret = {'code': '324', 'msg': None,'data':{}}
+        ret['msg'] = '检票失败，该票已使用'
+        ret['data'] = {
+            'ticket_id': ticket_id,
+        }
+        return JsonResponse(ret)
+
+    # update
+    ticket.is_checked = True
+
+    # save
+    ticket.save()
+
+    # ret msg
+    ret = {'code': '024', 'msg': None,'data':{}}
+    ret['msg'] = '检票成功'
+    ret['data'] = {
+        'ticket_id': ticket_id, 
+    }
+    return JsonResponse(ret)
+
 '''
 Part 3
 Intro: Functions to operate star
@@ -917,98 +979,8 @@ def getStarList(request):
     }
     return JsonResponse(ret)
 
-
-
 '''
 Part 4
-Intro: Function to operate QRCode
-Num: 2
-List: 
-    - testQRCode(request)
-    - logo(request)
-'''
-
-# def testQRCode(request): 
-#     '''
-#     Intro: 
-        
-#     Args(request): 
-        
-#     Returns: 
-#         {code: , msg: , data: {}}
-#     '''
-#     test_ticket = Ticket.objects.get(ticket_id = 20)
-
-#     # create new QRCode
-#     qr = qrcode.QRCode(
-#         version=None,
-#         error_correction=qrcode.constants.ERROR_CORRECT_L,
-#         box_size=10,
-#         border=2,
-#     )
-#     url='another_test_qrcode'
-#     qr.add_data(url)
-#     qr.make(fit=True)
-#     img = qr.make_image()
-#     img.save('media/QR/test_qrcode.png')
-#     test_ticket.QRCode = 'QR/test_qrcode.png'
-#     test_ticket.save()
-#     '''
-#     ERROR_CORRECT_L: 大约7%或更少的错误能被纠正
-#     ERROR_CORRECT_M:（默认）大约15%或更少的错误能被纠正
-#     ROR_CORRECT_H:大约30%或更少的错误能被纠正
-#     '''
-#     return HttpResponse(test_ticket.QRCode.url)
-
-def logo(request): 
-    '''
-    Intro: 
-        
-    Args(request): 
-        
-    Returns: 
-        {code: , msg: , data: {}}
-    '''
-    test_ticket = Ticket.objects.get(ticket_id = 21)
-    # create new QRCode
-    qr = qrcode.QRCode(
-        version=5,
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=8,
-        border=4,
-    )
-    # url=str(id)
-    url=str(21)
-    qr.add_data(url)
-    qr.make(fit=True)
-    img = qr.make_image()
-    img = img.convert("RGBA")
-    icon = Image.open('media/logo.png')
-    img_w, img_h = img.size
-    factor = 4
-    size_w = int(img_w / factor)
-    size_h = int(img_h / factor)
-    icon_w, icon_h = icon.size
-    if icon_w >size_w:
-        icon_w = size_w
-    if icon_h > size_h:
-        icon_h = size_h
-    icon = icon.resize((icon_w, icon_h),Image.ANTIALIAS)
-    w = int((img_w - icon_w) / 2)
-    h = int((img_h - icon_h) / 2)
-    icon = icon.convert("RGBA")
-    img.paste(icon, (w, h), icon)
-
-    img.save('media/QR/' + str(21) +'.png')
-    test_ticket.QRCode = 'QR/' + str(21) +'.png'
-    test_ticket.save()
-
-    return HttpResponse(test_ticket.QRCode.url)
-
-
-
-'''
-Part 5
 Intro: Functions to save test data
 Num: 1
 List: 
@@ -1073,10 +1045,8 @@ def saveTestData(request):
     }
     return JsonResponse(ret)
 
-
-
 '''
-Part 6
+Part 5
 Intro: Function to show page for testing net connect
 Num: 1
 List: 

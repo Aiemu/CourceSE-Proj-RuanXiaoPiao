@@ -44,24 +44,21 @@ urlpatterns = [
     path('refundTicket/', views.refundTicket), # 退票 21
     path('getTicketList/', views.getTicketList), # 获取已购票列表 22
     path('getTicketInfo/', views.getTicketInfo), # 获取票的详情 23
+    path('checkTicket/', views.checkTicket), # 检票端检票 24
 
     # Part 3: star
     path('starActivity/', views.starActivity), # 收藏 30
     path('deleteStar/', views.deleteStar), # 取消收藏 31
     path('getStarList/', views.getStarList), # 获取收藏列表 32
 
-    # # Part 4: QRCode
-    # path('testQRCode/', views.testQRCode), # 测试二维码 40
-    path('logo/', views.logo), # 添加二维码logo 41
+    # Part 4: save test data
+    path('saveTestData/', views.saveTestData), # 存入测试数据 40
 
-    # Part 5: save test data
-    path('saveTestData/', views.saveTestData), # 存入测试数据 50
+    # Part 5: test
+    path('index/', views.index), # 测试界面 50
 
-    # Part 6: test
-    path('index/', views.index), # 测试界面 60
-
-    # Part 7: admin
-    path('admin/', admin.site.urls), # 管理 70
+    # Part 6: admin
+    path('admin/', admin.site.urls), # 管理 60
 
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
