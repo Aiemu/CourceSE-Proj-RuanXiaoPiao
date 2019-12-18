@@ -530,10 +530,10 @@ def purchaseTicket(request):
         icon = icon.convert("RGBA")
         img.paste(icon, (w, h), icon)
 
-        # img.save('media/QR/' + str(ticket.ticket_id) +'.png')
-        # ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
-        img.save('media/QR/newQR.png')
-        ticket.QRCode = 'QR/newQR.png'
+        img.save('media/QR/' + str(ticket.ticket_id) +'.png')
+        ticket.QRCode = 'QR/' + str(ticket.ticket_id) +'.png'
+        # img.save('media/QR/newQR.png')
+        # ticket.QRCode = 'QR/newQR.png'
 
         # save ticket
         ticket.save()
