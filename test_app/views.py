@@ -34,9 +34,10 @@ appsecret = '4acadab52b5a08cd3166d4743c39f3f8'
 '''
 Part 0
 Intro: Function to init
-Num: 1
+Num: 2
 List: 
     - init(request)
+    - verifyUser(request)
 '''
 
 @api_view(['POST'])
@@ -139,8 +140,8 @@ Intro: Functions to operate activity
 Num: 4
 List: 
     - getActivityList(request)
-    - getScrollActivity(request)
     - getActivityInfo(request)
+    - getScrollActivity(request)
     - searchEngine(request)
 '''
 
@@ -394,12 +395,13 @@ def searchEngine(request):
 '''
 Part 2
 Intro: Functions to operate ticket
-Num: 4
+Num: 5
 List: 
     - purchaseTicket(request)
     - refundTicket(request)
     - getTicketList(request)
     - getTicketInfo(request)
+    - checkTicket(request)
 '''
 
 def purchaseTicket(request): 
@@ -416,7 +418,6 @@ def purchaseTicket(request):
         {code: 320, msg: 购票失败，余票不足, data: {openid(str), activity_id(int), remain(int)}}
         {code: 320, msg: 购票失败，票已存在, data: {openid(str), activity_id(int), remain(int)}}
         {code: 020, msg: 购票成功, data: {openid(str), activity_id(int), remain(int)}}
-
     '''
     # get openid & activity_id
     openid = request.POST.get('openid')
@@ -750,7 +751,7 @@ Num: 3
 List: 
     - starActivity(request)
     - deleteStar(request)
-    - deleteStar(request)
+    - getStarList(request)
 '''
 
 def starActivity(request): 
@@ -882,7 +883,7 @@ def getStarList(request):
         openid(str): used to identify user
     Returns: 
         {code: 132, msg: 获取收藏列表失败，该用户不存在, data: {openid(str)}}
-        {code: 032, msg: 收藏列表获取成功, data: {activityList(list)}}
+        {code: 032, msg: 获取收藏列表成功, data: {activityList(list)}}
     '''
     # get openid
     openid = request.POST.get('openid')
@@ -940,7 +941,7 @@ def getStarList(request):
     
     # ret msg
     ret = {'code': '032', 'msg': None,'data':{}}
-    ret['msg'] = '收藏列表获取成功'
+    ret['msg'] = '获取收藏列表成功'
     ret['data'] = {
         'activityList': retList,
     }
@@ -953,7 +954,8 @@ Part 4
 Intro: Function to operate QRCode
 Num: 2
 List: 
-    - index(request)
+    - testQRCode(request)
+    - logo(request)
 '''
 
 def testQRCode(request): 
@@ -1051,7 +1053,6 @@ def saveTestData(request):
         None
     Returns: 
         {code: 050, msg: 保存成功, data: {newUser(str), newActivity(list)}}
-
     '''
     # test data for user
     openid = 'testOpenid'

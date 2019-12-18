@@ -72,10 +72,10 @@ Page({
                 var postData = {
                     // code: data.code,
                     openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
-                    ticket_id: 35, // TODO
+                    ticket_id: 48, // TODO
                 };
                 wx.request({
-                    url: 'http://127.0.0.1:8000/checkTicket/',
+                    url: 'http://62.234.50.47/checkTicket/',
                     data: postData,
                     method: 'POST',
                     header: {
