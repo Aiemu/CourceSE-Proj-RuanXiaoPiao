@@ -1,0 +1,10 @@
+<view>
+    <button open-type="getUserInfo" bindgetuserinfo="bindGetOpenID">授权</button>
+    <button bindtap="verifyUser">认证</button>
+    <button bindtap="checkTicket">检票</button>
+    <button open-type="getUserInfo" bindgetuserinfo="bindGetTicketList">获取已购票列表</button>
+    <button open-type="getUserInfo" bindgetuserinfo="bindGetTicketInfo">获取票详情</button>
+    <button open-type="getUserInfo" bindgetuserinfo="bindRefundTicket">退票</button>
+    <button open-type="getUserInfo" bindgetuserinfo="bindGetStarList">获取收藏列表</button>
+    <button bindtap="saveTestData">存入数据</button>
+</view>
