@@ -1,0 +1,14 @@
+{
+  "navigationBarTitleText": "活动详情",
+  "usingComponents": {
+    "van-button": "/vant-weapp/button/index",
+    "van-row": "/vant-weapp/row/index",
+    "van-col": "/vant-weapp/col/index",
+    "van-dialog": "/vant-weapp/dialog/index",
+    "van-cell": "/vant-weapp/cell/index",
+    "van-cell-group": "/vant-weapp/cell-group/index",
+    "van-radio": "/vant-weapp/radio/index",
+    "van-radio-group": "/vant-weapp/radio-group/index",
+    "van-toast": "/vant-weapp/toast/index"
+  }
+}

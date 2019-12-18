@@ -1,0 +1,40 @@
+<import src="../../wxParse/wxParse.wxml" />
+<van-dialog id="van-dialog" />
+<van-toast id="van-toast" />
+<view class="activity">
+    <image class="post" src="{{activityDetail.basicInfo.image}}"></image>
+    <view class="meta">
+        <text class="title">{{activityDetail.basicInfo.title}}</text>
+        <view class="lastline">
+            <!--TODO: 添加状态内容 -->
+            <text class="state">{{activityDetail.basicInfo.status}}</text>
+            <text wx:if="{{activityDetail.basicInfo.price}}" class="price">{{activityDetail.basicInfo.price}}元</text>
+            <text class="hot">{{activityDetail.basicInfo.heat}}</text>
+        </view>
+    </view>
+</view>
+<view class="meta">
+    <text class="date">{{activityDetail.basicInfo.time}}</text>
+    <text class="location">{{activityDetail.basicInfo.place}}</text>
+    <text class="sponsor">{{activityDetail.basicInfo.publisher}}</text>
+</view>
+<view class="buttons">
+    <van-row>
+        <van-col span="12" bindtap="tapCollect">
+            <van-button wx:if="{{collected}}" plain hairline type="primary" size="large">已关注</van-button>
+            <van-button wx:else plain hairline type="primary" size="large">关注</van-button>
+        </van-col>
+        <van-col span="12"><van-button plain hairline type="primary" size="large" open-type="share">分享</van-button></van-col>
+    </van-row>
+</view>
+
+<view class="activity-detail">
+    <view class="tag">活动详情</view>
+    <view class="content">
+        <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+    </view>
+</view>
+<view class="buy-button">
+    <van-button wx:if="{{activityDetail.basicInfo.status == '正在抢票'}}" round type="info" size="large" color="#e74c3c" bindtap="onClickTicketing">立即抢票</van-button>
+    <van-button wx:else disabled round type="info" size="large" color="#e74c3c">立即抢票</van-button>
+</view>

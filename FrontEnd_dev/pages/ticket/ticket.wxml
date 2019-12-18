@@ -1,0 +1,12 @@
+<!--pages/ticket/ticket.wxml-->
+<view wx:if="{{is_refund}}" class="t">已退票</view>
+<image wx:else class="qrcode"></image>
+<van-cell-group title="活动信息">
+  <van-cell title="名称" value="{{info.title}}"/>
+  <van-cell title="地点" value="{{info.place}}"/>
+  <van-cell title="时间" value="{{info.act_time}}"/>
+</van-cell-group>
+<van-cell-group title="订单信息">
+  <van-cell title="用户名" value="{{info.owner}}"/>
+  <van-cell title="订单时间" value="{{info.tic_time}}"/>
+</van-cell-group>

@@ -1,0 +1,22 @@
+<!--pages/my_collect/my_collect.wxml-->
+<view class="header">您收藏的活动</view>
+<view wx:if="{{has_activity}}">
+  <view wx:for="{{collectlist}}" wx:key="ticket_id" class="activity" bindtap="info" data-id="{{item.activity_id}}">
+    <image class="post" src="{{item.image}}"></image>
+    <view class="meta">
+      <text class="title">{{item.title}}</text>
+      <text class="date">{{item.time}}</text>
+      <text class="location">{{item.place}}</text>
+      <text class="price">{{item.price}}</text>
+      <text class="status">{{item.status}}</text>
+      <button size="mini" class="cancel" catchtap="cancelstar" data-id="{{item.activity_id}}">
+       <view class="t">取消收藏</view>
+      </button>
+    </view>
+  </view>
+</view>
+<view wx:else class="none">
+  <image class="noneimg"></image>
+  <text class="nonetext">暂无关注的活动</text>
+</view>
+<van-dialog id="van-dialog"/>
