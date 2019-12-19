@@ -38,6 +38,8 @@ urlpatterns = [
     path('getActivityInfo/', views.getActivityInfo), # 获取活动详情 11
     path('getScrollActivity/', views.getScrollActivity), # 获取滚图活动 12
     path('searchEngine/', views.searchEngine), # 搜索 13
+    path('getTimeSortedActivity/', views.getTimeSortedActivity), # 按时间排序 14
+    path('getHeatSortedActivity/', views.getHeatSortedActivity), # 按热度排序 15
 
     # Part 2: ticket
     path('purchaseTicket/', views.purchaseTicket), # 购票 20

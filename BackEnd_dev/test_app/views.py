@@ -139,12 +139,14 @@ def verifyUser(request):
 '''
 Part 1
 Intro: Functions to operate activity
-Num: 4
+Num: 6
 List: 
     - getActivityList(request)
     - getActivityInfo(request)
     - getScrollActivity(request)
     - searchEngine(request)
+    - getTimeSortedActivity(request)
+    - getHeatSortedActivity(request)
 '''
 
 def getActivityList(request): 
@@ -389,6 +391,126 @@ def searchEngine(request):
     ret['msg'] = '搜索成功'
     ret['data'] = {
         'actList': retactList,
+    }
+    return JsonResponse(ret)
+
+def getTimeSortedActivity(request): 
+    '''
+    Intro: 
+        return activities sorted by time
+    Args(request): 
+        None
+    Returns: 
+        {code: 014, msg: 获取按时间排序的活动列表成功, data: {activityList(list)}}
+    '''
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    # get list
+    actList = Activity.objects.filter(min_heat=0).order_by('-time')
+    retList = []
+
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        
+        # save
+        item.save() 
+
+        # create json
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            'image': 'http://62.234.50.47' + item.image.url,
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price,
+            'heat': item.heat,
+        }
+
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '014', 'msg': None,'data':{}}
+    ret['msg'] = '获取按时间排序的活动列表成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)
+
+def getHeatSortedActivity(request): 
+    '''
+    Intro: 
+        return activities sorted by heat
+    Args(request): 
+        None
+    Returns: 
+        {code: 015, msg: 获取按热度排序的活动列表成功, data: {activityList(list)}}
+    '''
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    # get list
+    actList = Activity.objects.filter(min_heat=0).order_by('-heat')
+    retList = []
+
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        
+        # save
+        item.save() 
+
+        # create json
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            'image': 'http://62.234.50.47' + item.image.url,
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price,
+            'heat': item.heat,
+        }
+
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '015', 'msg': None,'data':{}}
+    ret['msg'] = '获取按热度排序的活动列表成功'
+    ret['data'] = {
+        'activityList': retList,
     }
     return JsonResponse(ret)
 
