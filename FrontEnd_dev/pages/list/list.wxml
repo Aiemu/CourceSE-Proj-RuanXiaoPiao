@@ -1,9 +1,43 @@
+<van-dialog
+  use-slot
+  title="需要微信授权"
+  show="{{ ifNeedAuth }}"
+  confirm-button-open-type="getUserInfo"
+  bind:close="onClose"
+  bind:getuserinfo="getUserInfo"
+>
+</van-dialog>
+
 <view>
-    <button bindtap="getActivityList">获取活动列表</button>
-    <button bindtap="getScrollActivity">获取滚图</button>
-    <button bindtap="getActivityInfo">获取活动详情</button>
-    <button open-type="getUserInfo" bindgetuserinfo="purchaseTicket">购票</button>
-    <button open-type="getUserInfo" bindgetuserinfo="starActivity">收藏</button>
-    <button open-type="getUserInfo" bindgetuserinfo="deleteStar">取消收藏</button>
-    <button bindtap="searchEngine">搜索</button>
+    <van-search placeholder="活动名称" disabled bindtap="toSearchTap"></van-search>
 </view>
+<view>
+    <swiper indicator-dots="true" indicator-active-color="#fff" autoplay circular>
+        <swiper-item wx:for="{{banners}}" wx:key="">
+            <van-image width="10rem" height="10rem" fit="contain" src="{{item.image}}"/>
+        </swiper-item>
+    </swiper>
+</view>
+<view>
+    <van-tabs>
+    <van-tab title="全部">
+        <view class="activity" wx:for="{{activityList}}" wx:for-item="activity" wx:key="id" data-id="{{activity.activity_id}}" bindtap="toDetailsTap">  
+            <image class="post" src="{{activity.image}}"></image>
+            <view class="meta">
+                <text class="title">{{activity.title}}</text>
+                <text class="date">{{activity.time}}</text>
+                <text class="location">{{activity.place}}</text>
+                <text class="sponsor">{{activity.publisher}}</text>
+                <view class="lastline">
+                  <!--TODO: 添加状态内容 -->
+                  <text class="state">{{activity.status}}</text>
+                  <text wx:if="{{activity.price}}" class ="price">{{activity.price}}元</text>
+                  <text class="hot">{{activity.heat}}</text>
+                </view>
+            </view>
+        </view>
+    </van-tab>
+    <van-tab title="筛选1">内容 2</van-tab>
+    <van-tab title="筛选2">内容 3</van-tab>
+    </van-tabs>
+ </view>

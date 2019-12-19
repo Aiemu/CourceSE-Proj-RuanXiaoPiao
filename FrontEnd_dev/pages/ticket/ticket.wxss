@@ -1,0 +1,4 @@
+/* pages/ticket/ticket.wxss */
+.t{
+  text-align: center;
+}

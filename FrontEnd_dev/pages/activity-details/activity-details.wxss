@@ -1,0 +1,56 @@
+@import "/wxParse/wxParse.wxss"
+
+.activity{
+    display: flex;
+    border-top: 5rpx solid gray;
+    padding-top: 20rpx;
+    margin-bottom: 20rpx;
+  }
+  .post{
+    width: 250rpx;
+    height: 280rpx;
+    margin-left: 50rpx;
+  }
+  .meta{
+    display: flex;
+    flex-direction: column;
+    margin-left: 50rpx;
+  }
+  .date{
+    margin-top: 10rpx;
+    font-size: 26rpx;
+  }
+  .location{
+    font-size: 26rpx;
+  }
+  .sponsor{
+    font-size: 26rpx;
+  }
+  .lastline{
+    font-size: 35rpx;
+    display: flex;
+    margin-top: auto;
+  }
+  .state{
+    color:green;
+  }
+  .price{
+    margin-left: 30rpx;
+  }
+  .hot{
+    color:red;
+    margin-left: 100rpx;
+  }
+  .activity-detail{
+      margin-top: 50rpx;
+      margin-left: 40rpx;
+  }
+  .activity-detail .tag{
+      margin-bottom: 30rpx;
+  }
+  .buttons{
+    margin: 10rpx;
+  }
+  .buy-button{
+      margin: 55rpx;
+  }

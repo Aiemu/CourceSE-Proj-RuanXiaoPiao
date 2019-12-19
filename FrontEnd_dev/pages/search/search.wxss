@@ -1,0 +1,44 @@
+.activity{
+    display: flex;
+    justify-content: flex-start;
+    border-top: 5rpx solid gray;
+    padding-top: 20rpx;
+    margin-bottom: 20rpx;
+  }
+  .post{
+    width: 250rpx;
+    height: 280rpx;
+    margin-left: 50rpx;
+    margin-right: 50rpx;  
+  }
+  .meta{
+    display: flex;
+    flex-direction: column;
+  }
+  .date{
+    font-size: 26rpx;
+    color:gray;
+  }
+  .location{
+    font-size: 26rpx;
+    color:gray;
+  }
+  .sponsor{
+    font-size: 26rpx;
+    color:gray;
+  }
+  .lastline{
+    font-size: 35rpx;
+    display: flex;
+    margin-top: auto;
+  }
+  .state{
+    color:green;
+  }
+  .price{
+    margin-left: 30rpx;
+  }
+  .hot{
+    color:red;
+    margin-left: 200rpx;
+  }
