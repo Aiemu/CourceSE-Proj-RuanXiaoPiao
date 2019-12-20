@@ -31,7 +31,8 @@
 <view class="activity-detail">
     <view class="tag">活动详情</view>
     <view class="content">
-        <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+        {{activityDetail.basicInfo.description}}
+        <!-- <template is="wxParse" data="{{wxParseData:article.nodes}}" /> -->
     </view>
 </view>
 <view class="buy-button">

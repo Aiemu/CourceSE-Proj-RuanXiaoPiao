@@ -32,6 +32,7 @@ Page({
         for (var i = 0; i < list.length; i++) {
           list[i] = JSON.parse(list[i])
         }
+        console.log(list)
         that.setData({
           orderlist: list
         })

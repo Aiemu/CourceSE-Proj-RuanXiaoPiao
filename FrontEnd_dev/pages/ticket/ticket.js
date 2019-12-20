@@ -7,7 +7,7 @@ Page({
    */
   data: {
     info: {},
-    is_refund: true,
+    is_refund: false,
   },
 
   /**
@@ -27,6 +27,7 @@ Page({
         'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
       },
       success: function (res) {
+        console.log(res.data)
         //回调处理
         that.setData({
           info: res.data.data
