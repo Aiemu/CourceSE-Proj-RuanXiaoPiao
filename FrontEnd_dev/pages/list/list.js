@@ -114,7 +114,54 @@ Page({
             }
         })
     },
+    getSortedList(e) {
+        var index = e.detail.name
+        let list = []
+        let that = this
+        var postData = {
+            str: 'get list'
+        }
+        let tmpUrl = ""
+        if(index == 1) {
+            tmpUrl = "http://62.234.50.47/getTimeSortedActivity/"
+        }
+        else if(index == 2) {
+            tmpUrl = "http://62.234.50.47/getTimeSortedActivity/"
+        }
+        // index == 0时，所有活动不需要请求
+        else {
+            return
+        }
+        wx.request({
+            url: tmpUrl,
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                list = res.data.data.activityList
+                for (let i = 0; i < list.length; i++) {
+                    list[i] = JSON.parse(list[i])
+                    list[i].heat = Math.ceil(list[i].heat)
+                }
+                if(index == 1) {
+                    that.setData({
+                        timeSortedList: list
+                    })
+                }
+                else {
+                    that.setData({
+                        heatSortedList: list
+                    })
+                }
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
 
+    },
     toDetailsTap: function(e) {
         wx.navigateTo({
           url: '/pages/activity-details/activity-details?id=' + e.currentTarget.dataset.id
