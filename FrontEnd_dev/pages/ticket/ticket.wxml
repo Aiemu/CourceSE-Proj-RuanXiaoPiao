@@ -1,6 +1,6 @@
 <!--pages/ticket/ticket.wxml-->
-<view wx:if="{{is_refund}}" class="t">已退票</view>
-<image wx:else class="qrcode"></image>
+<view wx:if="{{!info.is_valid}}" class="t">已退票</view>
+<view wx:else class="qrcode"><image src="http://62.234.50.47/media/QR/None.png"></image></view>
 <van-cell-group title="活动信息">
   <van-cell title="名称" value="{{info.title}}"/>
   <van-cell title="地点" value="{{info.place}}"/>
