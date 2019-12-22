@@ -883,58 +883,69 @@ def checkTicket(request):
         {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
         {code: 024, msg: 检票成功, data: {ticket_id(int), student_id(str), time(date), place(str)}}
     '''
-    # get ticket_id
-    ticket_id = request.POST.get('ticket_id')
+    # get ticket info
+    user_id = request.POST.get('user_id')
+    activity_id = request.POST.get('activity_id')
 
     # get ticket
-    try: 
-        ticket = Ticket.objects.get(ticket_id = ticket_id)
+    try:
+        tickets = Ticket.objects.all()
+        found = False
+        for item in tickets:
+            if item.owner.user_id == user_id:
+                if item.activity.activity_id == activity_id:
+                    found = True
+                    ticket = item
+                break
+
+        if not found:
+            # ret msg
+            ret = {'code': '324', 'msg': None,'data':{}}
+            ret['msg'] = '检票失败，该票不存在'
+            ret['data'] = {
+                'ticket_id': ticket_id
+            }
+            return JsonResponse(ret)
+        else:
+            # check time
+            if ticket.activity.status == u'已结束': 
+                # ret msg
+                ret = {'code': '224', 'msg': None,'data':{}}
+                ret['msg'] = '检票失败，该活动已结束'
+                ret['data'] = {
+                    'ticket_id': ticket_id,
+                }
+                return JsonResponse(ret)
+
+            # check ticket
+            if ticket.is_checked: 
+                # ret msg
+                ret = {'code': '324', 'msg': None,'data':{}}
+                ret['msg'] = '检票失败，该票已使用'
+                ret['data'] = {
+                    'ticket_id': ticket_id,
+                }
+                return JsonResponse(ret)
+
+            # update
+            ticket.is_checked = True
+
+            # save
+            ticket.save()
+
+            # ret msg
+            ret = {'code': '024', 'msg': None,'data':{}}
+            ret['msg'] = '检票成功'
+            ret['data'] = {
+                'ticket_id': ticket_id, 
+                'surdent_id': ticket.owner.student_id, 
+                'time': ticket.activity.time, 
+                'palce': ticket.activity.place,
+            }
+            return JsonResponse(ret)
 
     except:
-        # ret msg
-        ret = {'code': '324', 'msg': None,'data':{}}
-        ret['msg'] = '检票失败，该票不存在'
-        ret['data'] = {
-            'ticket_id': ticket_id
-        }
-        return JsonResponse(ret)
-
-    # check time
-    if ticket.activity.status == u'已结束': 
-        # ret msg
-        ret = {'code': '224', 'msg': None,'data':{}}
-        ret['msg'] = '检票失败，该活动已结束'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-        }
-        return JsonResponse(ret)
-
-    # check ticket
-    if ticket.is_checked: 
-        # ret msg
-        ret = {'code': '324', 'msg': None,'data':{}}
-        ret['msg'] = '检票失败，该票已使用'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-        }
-        return JsonResponse(ret)
-
-    # update
-    ticket.is_checked = True
-
-    # save
-    ticket.save()
-
-    # ret msg
-    ret = {'code': '024', 'msg': None,'data':{}}
-    ret['msg'] = '检票成功'
-    ret['data'] = {
-        'ticket_id': ticket_id, 
-        'surdent_id': ticket.owner.student_id, 
-        'time': ticket.activity.time, 
-        'palce': ticket.activity.place,
-    }
-    return JsonResponse(ret)
+        pass
 
 '''
 Part 3
@@ -1224,9 +1235,18 @@ def index(request):
     '''
     return HttpResponse("060\nHello! You are at the index page")
 
-def randomStr(request):
-    letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
-    randomString = ''
-    for i in range(5):
-        randomString = randomString + random.choice(letters)
-    return HttpResponse(randomString)
+# def getTwo(request):
+#     try:
+#         tickets = Ticket.objects.all()
+#         checked = False
+#         for ticket in tickets:
+#             if ticket.owner.user_id == 4:
+#                 if ticket.activity.activity_id == 5:
+#                     checked = True
+#                 break
+#         if checked:
+#             return HttpResponse("getTwo_Found")
+#         else:
+#             return HttpResponse("getTwo_NotFound")
+#     except:
+#         return HttpResponse("getTwo_NotCheck")
