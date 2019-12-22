@@ -40,6 +40,7 @@ urlpatterns = [
     path('searchEngine/', views.searchEngine), # 搜索 13
     path('getTimeSortedActivity/', views.getTimeSortedActivity), # 按时间排序 14
     path('getHeatSortedActivity/', views.getHeatSortedActivity), # 按热度排序 15
+    path('addActivity/', views.addActivity), # 添加活动 16
 
     # Part 2: ticket
     path('purchaseTicket/', views.purchaseTicket), # 购票 20

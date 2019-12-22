@@ -102,12 +102,14 @@ def verifyUser(request):
         update user's is_verified
     Args(request): 
         openid(str): used to identify user
+        student_id: flag to verify
     Returns: 
         {code: 101, msg: 认证失败，该用户不存在, data: {openid(str)}}
         {code: 001, msg: 认证成功, data: {openid(str)}}
     '''
     # get openid
     openid = request.POST.get('openid')
+    student_id = request.POST.get('student_id')
 
     # get user
     try: 
@@ -122,6 +124,7 @@ def verifyUser(request):
     
     # update user
     user.is_verified = True
+    # user.student_id = student_id
 
     # save
     user.save()
@@ -139,7 +142,7 @@ def verifyUser(request):
 '''
 Part 1
 Intro: Functions to operate activity
-Num: 6
+Num: 7
 List: 
     - getActivityList(request)
     - getActivityInfo(request)
@@ -147,6 +150,7 @@ List:
     - searchEngine(request)
     - getTimeSortedActivity(request)
     - getHeatSortedActivity(request)
+    - addActivity(request)
 '''
 
 def getActivityList(request): 
@@ -514,6 +518,24 @@ def getHeatSortedActivity(request):
     }
     return JsonResponse(ret)
 
+def addActivity(request): 
+    '''
+    Intro: 
+        add activity into database
+    Args(request): 
+        title(str): activity title
+        price(double): activity price
+        place(str): activity place
+        time(date): activity time
+    Returns: 
+        {code: 015, msg: 获取按热度排序的活动列表成功, data: {activityList(list)}}
+    '''
+    title = request.POST.get('title')
+    price = request.POST.get('price')
+    place = request.POST.get('place')
+    time = request.POST.get('time')
+    # TODO
+
 
 
 '''
@@ -850,7 +872,7 @@ def checkTicket(request):
         {code: 324, msg: 检票失败，该票不存在, data: {ticket_id(int)}}
         {code: 224, msg: 检票失败，该活动已结束, data: {ticket_id(int)}}
         {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
-        {code: 024, msg: 检票成功, data: {ticket_id(int)}}
+        {code: 024, msg: 检票成功, data: {ticket_id(int), student_id(str), time(date), place(str)}}
     '''
     # get ticket_id
     ticket_id = request.POST.get('ticket_id')
@@ -899,6 +921,9 @@ def checkTicket(request):
     ret['msg'] = '检票成功'
     ret['data'] = {
         'ticket_id': ticket_id, 
+        'surdent_id': ticket.owner.student_id, 
+        'time': ticket.activity.time, 
+        'palce': ticket.activity.place,
     }
     return JsonResponse(ret)
 

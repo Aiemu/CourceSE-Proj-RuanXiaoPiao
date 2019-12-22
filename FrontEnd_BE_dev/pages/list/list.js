@@ -27,7 +27,7 @@ Page({
         };
         wx.request({
             // url: 'http://62.234.50.47/getActivityList/',
-            url: 'http://127.0.0.1:8000/getTimeSortedActivity/',
+            url: 'http://62.234.50.47/getTimeSortedActivity/',
             data: postData,
             method: 'POST',
             header: {
@@ -49,7 +49,7 @@ Page({
         };
         wx.request({
             // url: 'http://62.234.50.47/getActivityList/',
-            url: 'http://127.0.0.1:8000/getHeatSortedActivity/',
+            url: 'http://62.234.50.47/getHeatSortedActivity/',
             data: postData,
             method: 'POST',
             header: {
