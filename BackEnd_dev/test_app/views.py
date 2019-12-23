@@ -952,8 +952,14 @@ def checkTicket(request):
     except:
         # 由于try中已包含几乎所有情况，出现的except按照查无此票处理
         # ret msg
+        # ret = {'code': '324', 'msg': None, 'data':{}}
+        # ret['msg'] = '检票失败，该票不存在'
+        # ret['data'] = {
+        #     'user_id': user_id,
+        #     'activity_id': activity_id,
+        # }
         ret = {'code': '324', 'msg': None, 'data':{}}
-        ret['msg'] = '检票失败，该票不存在'
+        ret['msg'] = '检票失败，抛出异常'
         ret['data'] = {
             'user_id': user_id,
             'activity_id': activity_id,
