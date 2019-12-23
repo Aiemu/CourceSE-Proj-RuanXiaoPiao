@@ -109,10 +109,9 @@ def verifyUser(request):
     '''
     # get openid & student_id
     openid = request.POST.get('openid')
+    student_id = request.POST.get('student_id')
 
-    try:
-        student_id = request.POST.get('student_id')
-    except:
+    if student_id == null:
         ret = {'code': '401', 'msg': None,'data':{}}
         ret['msg'] = '认证失败，无学号'
         ret['data'] = {
