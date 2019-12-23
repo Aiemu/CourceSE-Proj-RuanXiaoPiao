@@ -170,10 +170,10 @@ List:
     Args(request): 
         ticket_id(int)
     Returns: 
-        {code: 324, msg: 检票失败，该票不存在, data: {ticket_id(int)}}
-        {code: 224, msg: 检票失败，该活动已结束, data: {ticket_id(int)}}
-        {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
-        {code: 024, msg: 检票成功, data: {ticket_id(int)}}
+        {code: 324, msg: 检票失败，该票不存在, data: {user_id(int), activity_id(int)}}
+        {code: 224, msg: 检票失败，该活动已结束, data: {user_id(int), activity_id(int)}}
+        {code: 324, msg: 检票失败，该票已使用, data: {user_id(int), activity_id(int)}}
+        {code: 024, msg: 检票成功, data: {user_id(int), activity_id(int), ticket_id(int), student_id(str), time(date), place(str)}}
     '''
     ```
 

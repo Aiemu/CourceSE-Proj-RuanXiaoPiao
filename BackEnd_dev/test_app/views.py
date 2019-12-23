@@ -878,10 +878,10 @@ def checkTicket(request):
     Args(request): 
         ticket_id(int)
     Returns: 
-        {code: 324, msg: 检票失败，该票不存在, data: {ticket_id(int)}}
-        {code: 224, msg: 检票失败，该活动已结束, data: {ticket_id(int)}}
-        {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
-        {code: 024, msg: 检票成功, data: {ticket_id(int), student_id(str), time(date), place(str)}}
+        {code: 324, msg: 检票失败，该票不存在, data: {user_id(int), activity_id(int)}}
+        {code: 224, msg: 检票失败，该活动已结束, data: {user_id(int), activity_id(int)}}
+        {code: 324, msg: 检票失败，该票已使用, data: {user_id(int), activity_id(int)}}
+        {code: 024, msg: 检票成功, data: {user_id(int), activity_id(int), ticket_id(int), student_id(str), time(date), place(str)}}
     '''
     # get ticket info
     user_id = request.POST.get('user_id')
@@ -903,7 +903,8 @@ def checkTicket(request):
             ret = {'code': '324', 'msg': None, 'data':{}}
             ret['msg'] = '检票失败，该票不存在'
             ret['data'] = {
-                'ticket_id': ticket_id
+                'user_id': user_id,
+                'activity_id': activity_id,
             }
             return JsonResponse(ret)
         else:
@@ -913,7 +914,8 @@ def checkTicket(request):
                 ret = {'code': '224', 'msg': None, 'data':{}}
                 ret['msg'] = '检票失败，该活动已结束'
                 ret['data'] = {
-                    'ticket_id': ticket_id,
+                    'user_id': user_id,
+                    'activity_id': activity_id,
                 }
                 return JsonResponse(ret)
 
@@ -923,7 +925,8 @@ def checkTicket(request):
                 ret = {'code': '324', 'msg': None, 'data':{}}
                 ret['msg'] = '检票失败，该票已使用'
                 ret['data'] = {
-                    'ticket_id': ticket_id,
+                    'user_id': user_id,
+                    'activity_id': activity_id,
                 }
                 return JsonResponse(ret)
 
@@ -937,23 +940,25 @@ def checkTicket(request):
             ret = {'code': '024', 'msg': None, 'data':{}}
             ret['msg'] = '检票成功'
             ret['data'] = {
-                'ticket_id': ticket_id, 
-                'surdent_id': ticket.owner.student_id, 
+                'user_id': user_id,
+                'activity_id': activity_id,
+                'ticket_id': ticket.ticket_id, 
+                'student_id': ticket.owner.student_id, 
                 'time': ticket.activity.time, 
-                'palce': ticket.activity.place,
+                'place': ticket.activity.place,
             }
             return JsonResponse(ret)
 
-    except Exception as e:
-        # # 由于try中已包含几乎所有情况，出现的except按照查无此票处理
-        # # ret msg
-        # ret = {'code': '324', 'msg': None, 'data':{}}
-        # ret['msg'] = '检票失败，该票不存在'
-        # ret['data'] = {
-        #     'ticket_id': ticket_id
-        # }
-        # return JsonResponse(ret)
-        return JsonResponse(e)
+    except:
+        # 由于try中已包含几乎所有情况，出现的except按照查无此票处理
+        # ret msg
+        ret = {'code': '324', 'msg': None, 'data':{}}
+        ret['msg'] = '检票失败，该票不存在'
+        ret['data'] = {
+            'user_id': user_id,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
 
 '''
 Part 3
