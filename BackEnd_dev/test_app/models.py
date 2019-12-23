@@ -30,7 +30,7 @@ class User(models.Model):
     openid = models.CharField( max_length = 30)
     username = models.CharField(max_length = 30)
     password = models.CharField(max_length = 30)
-    student_id =  models.CharField(max_length = 10, default=0, null=True)
+    student_id =  models.CharField(max_length = 10, default=0, blank=True, null=True)
     starred = models.ManyToManyField(Activity)
 
     # varify info
