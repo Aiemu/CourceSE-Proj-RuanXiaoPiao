@@ -945,7 +945,14 @@ def checkTicket(request):
             return JsonResponse(ret)
 
     except:
-        pass
+        # 由于try中已包含几乎所有情况，出现的except按照查无此票处理
+        # ret msg
+        ret = {'code': '324', 'msg': None, 'data':{}}
+        ret['msg'] = '检票失败，该票不存在'
+        ret['data'] = {
+            'ticket_id': ticket_id
+        }
+        return JsonResponse(ret)
 
 '''
 Part 3
