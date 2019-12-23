@@ -87,7 +87,7 @@ def init(request):
     jwt = jwt_encode_handler(payload)
 
     # ret msg
-    ret = {'code': '000', 'msg': None,'data':{}}
+    ret = {'code': '000', 'msg': None, 'data':{}}
     ret['msg'] = '授权成功'
     ret['data'] = {
         'jwt': jwt,
@@ -111,8 +111,8 @@ def verifyUser(request):
     openid = request.POST.get('openid')
     student_id = request.POST.get('student_id')
 
-    if student_id == null:
-        ret = {'code': '401', 'msg': None,'data':{}}
+    if student_id == None:
+        ret = {'code': '401', 'msg': None, 'data':{}}
         ret['msg'] = '认证失败，无学号'
         ret['data'] = {
             'openid': openid,
@@ -123,7 +123,7 @@ def verifyUser(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '101', 'msg': None,'data':{}}
+        ret = {'code': '101', 'msg': None, 'data':{}}
         ret['msg'] = '认证失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -138,7 +138,7 @@ def verifyUser(request):
     user.save()
 
     # ret msg
-    ret = {'code': '001', 'msg': None,'data':{}}
+    ret = {'code': '001', 'msg': None, 'data':{}}
     ret['msg'] = '认证成功'
     ret['data'] = {
         'openid': openid,
@@ -215,7 +215,7 @@ def getActivityList(request):
         retList.append(iJson)
     
     # ret msg
-    ret = {'code': '010', 'msg': None,'data':{}}
+    ret = {'code': '010', 'msg': None, 'data':{}}
     ret['msg'] = '获取活动列表成功'
     ret['data'] = {
         'activityList': retList,
@@ -243,7 +243,7 @@ def getActivityInfo(request):
     try: 
         activity = Activity.objects.get(activity_id = activity_id)
     except:
-        ret = {'code': '211', 'msg': None,'data':{}}
+        ret = {'code': '211', 'msg': None, 'data':{}}
         ret['msg'] = '获取活动详情失败，该活动不存在'
         ret['data'] = {
             'activity_id': activity_id,
@@ -255,7 +255,7 @@ def getActivityInfo(request):
     activity.save()
 
     # ret msg
-    ret = {'code': '011', 'msg': None,'data':{}}
+    ret = {'code': '011', 'msg': None, 'data':{}}
     ret['msg'] = '活动详情获取成功'
     ret['data'] = {
         'activity_id': activity_id,
@@ -319,7 +319,7 @@ def getScrollActivity(request):
             break
     
     # ret msg
-    ret = {'code': '012', 'msg': None,'data':{}}
+    ret = {'code': '012', 'msg': None, 'data':{}}
     ret['msg'] = '获取滚图成功'
     ret['data'] = {
         'activityList': retList,
@@ -400,7 +400,7 @@ def searchEngine(request):
         retactList.append(iJson)
 
     # ret
-    ret = {'code': '013', 'msg': None,'data':{}}
+    ret = {'code': '013', 'msg': None, 'data':{}}
     ret['msg'] = '搜索成功'
     ret['data'] = {
         'actList': retactList,
@@ -460,7 +460,7 @@ def getTimeSortedActivity(request):
         retList.append(iJson)
     
     # ret msg
-    ret = {'code': '014', 'msg': None,'data':{}}
+    ret = {'code': '014', 'msg': None, 'data':{}}
     ret['msg'] = '获取按时间排序的活动列表成功'
     ret['data'] = {
         'activityList': retList,
@@ -520,7 +520,7 @@ def getHeatSortedActivity(request):
         retList.append(iJson)
     
     # ret msg
-    ret = {'code': '015', 'msg': None,'data':{}}
+    ret = {'code': '015', 'msg': None, 'data':{}}
     ret['msg'] = '获取按热度排序的活动列表成功'
     ret['data'] = {
         'activityList': retList,
@@ -582,7 +582,7 @@ def purchaseTicket(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '120', 'msg': None,'data':{}}
+        ret = {'code': '120', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -592,7 +592,7 @@ def purchaseTicket(request):
 
     # check if user is verified
     if not user.is_verified: 
-        ret = {'code': '120', 'msg': None,'data':{}}
+        ret = {'code': '120', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，该用户未认证'
         ret['data'] = {
             'openid': openid,
@@ -604,7 +604,7 @@ def purchaseTicket(request):
     try: 
         activity = Activity.objects.get(activity_id = activity_id)
     except:
-        ret = {'code': '220', 'msg': None,'data':{}}
+        ret = {'code': '220', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，该活动不存在'
         ret['data'] = {
             'openid': openid,
@@ -615,7 +615,7 @@ def purchaseTicket(request):
     # check remain
     if activity.remain <= 0:
         # ret msg
-        ret = {'code': '320', 'msg': None,'data':{}}
+        ret = {'code': '320', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，余票不足'
         ret['data'] = {
             'openid': openid,
@@ -632,7 +632,7 @@ def purchaseTicket(request):
                 # check is_valid
                 if i.activity == activity and i.is_valid:
                     #ret msg
-                    ret = {'code': '320', 'msg': None,'data':{}}
+                    ret = {'code': '320', 'msg': None, 'data':{}}
                     ret['msg'] = '购票失败，票已存在'
                     ret['data'] = {
                         'openid': openid,
@@ -696,7 +696,7 @@ def purchaseTicket(request):
         ticket.save()
         
         # ret msg
-        ret = {'code': '020', 'msg': None,'data':{}}
+        ret = {'code': '020', 'msg': None, 'data':{}}
         ret['msg'] = '购票成功'
         ret['data'] = {
             'openid': openid,
@@ -725,7 +725,7 @@ def refundTicket(request):
         activity = ticket.activity
     except: 
         # ret msg
-        ret = {'code': '321', 'msg': None,'data':{}}
+        ret = {'code': '321', 'msg': None, 'data':{}}
         ret['msg'] = '退票失败，该票不存在'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -748,7 +748,7 @@ def refundTicket(request):
         ticket.save()
 
         # ret msg
-        ret = {'code': '021', 'msg': None,'data':{}}
+        ret = {'code': '021', 'msg': None, 'data':{}}
         ret['msg'] = '退票成功'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -757,7 +757,7 @@ def refundTicket(request):
 
     else:
         # ret msg
-        ret = {'code': '321', 'msg': None,'data':{}}
+        ret = {'code': '321', 'msg': None, 'data':{}}
         ret['msg'] = '退票失败，该票为已退票状态'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -790,7 +790,7 @@ def getTicketList(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '122', 'msg': None,'data':{}}
+        ret = {'code': '122', 'msg': None, 'data':{}}
         ret['msg'] = '获取已购票列表失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -819,7 +819,7 @@ def getTicketList(request):
         retList.append(iJson)
 
     # ret msg
-    ret = {'code': '022', 'msg': None,'data':{}}
+    ret = {'code': '022', 'msg': None, 'data':{}}
     ret['msg'] = '获取已购票列表成功'
     ret['data'] = {
         'openid': openid,
@@ -847,7 +847,7 @@ def getTicketInfo(request):
     try:
         ticket = Ticket.objects.get(ticket_id = ticket_id)
     except:
-        ret = {'code': '323', 'msg': None,'data':{}}
+        ret = {'code': '323', 'msg': None, 'data':{}}
         ret['msg'] = '获取票详情失败，该票不存在'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -855,7 +855,7 @@ def getTicketInfo(request):
         return JsonResponse(ret)
 
     # ret msg
-    ret = {'code': '023', 'msg': None,'data':{}}
+    ret = {'code': '023', 'msg': None, 'data':{}}
     ret['msg'] = '获取票详情成功'
     ret['data'] = {
         'ticket_id': ticket_id,
@@ -900,7 +900,7 @@ def checkTicket(request):
 
         if not found:
             # ret msg
-            ret = {'code': '324', 'msg': None,'data':{}}
+            ret = {'code': '324', 'msg': None, 'data':{}}
             ret['msg'] = '检票失败，该票不存在'
             ret['data'] = {
                 'ticket_id': ticket_id
@@ -910,7 +910,7 @@ def checkTicket(request):
             # check time
             if ticket.activity.status == u'已结束': 
                 # ret msg
-                ret = {'code': '224', 'msg': None,'data':{}}
+                ret = {'code': '224', 'msg': None, 'data':{}}
                 ret['msg'] = '检票失败，该活动已结束'
                 ret['data'] = {
                     'ticket_id': ticket_id,
@@ -920,7 +920,7 @@ def checkTicket(request):
             # check ticket
             if ticket.is_checked: 
                 # ret msg
-                ret = {'code': '324', 'msg': None,'data':{}}
+                ret = {'code': '324', 'msg': None, 'data':{}}
                 ret['msg'] = '检票失败，该票已使用'
                 ret['data'] = {
                     'ticket_id': ticket_id,
@@ -934,7 +934,7 @@ def checkTicket(request):
             ticket.save()
 
             # ret msg
-            ret = {'code': '024', 'msg': None,'data':{}}
+            ret = {'code': '024', 'msg': None, 'data':{}}
             ret['msg'] = '检票成功'
             ret['data'] = {
                 'ticket_id': ticket_id, 
@@ -979,7 +979,7 @@ def starActivity(request):
 
     except:
         # ret msg
-        ret = {'code': '130', 'msg': None,'data':{}}
+        ret = {'code': '130', 'msg': None, 'data':{}}
         ret['msg'] = '收藏失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -993,7 +993,7 @@ def starActivity(request):
 
     except:
         # ret msg
-        ret = {'code': '230', 'msg': None,'data':{}}
+        ret = {'code': '230', 'msg': None, 'data':{}}
         ret['msg'] = '收藏失败，该活动不存在'
         ret['data'] = {
             'openid': openid,
@@ -1011,7 +1011,7 @@ def starActivity(request):
     activity.save()
 
     # ret msg
-    ret = {'code': '030', 'msg': None,'data':{}}
+    ret = {'code': '030', 'msg': None, 'data':{}}
     ret['msg'] = '收藏成功'
     ret['data'] = {
         'openid': openid,
@@ -1040,7 +1040,7 @@ def deleteStar(request):
         user = User.objects.get(openid = openid)
 
     except: 
-        ret = {'code': '131', 'msg': None,'data':{}}
+        ret = {'code': '131', 'msg': None, 'data':{}}
         ret['msg'] = '取消收藏失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -1053,7 +1053,7 @@ def deleteStar(request):
         activity = Activity.objects.get(activity_id = activity_id)
 
     except: 
-        ret = {'code': '231', 'msg': None,'data':{}}
+        ret = {'code': '231', 'msg': None, 'data':{}}
         ret['msg'] = '取消收藏失败，该活动不存在'
         ret['data'] = {
             'openid': openid,
@@ -1070,7 +1070,7 @@ def deleteStar(request):
     activity.save()
 
     # ret msg
-    ret = {'code': '031', 'msg': None,'data':{}}
+    ret = {'code': '031', 'msg': None, 'data':{}}
     ret['msg'] = '取消收藏成功'
     ret['data'] = {
         'openid': openid,
@@ -1095,7 +1095,7 @@ def getStarList(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '132', 'msg': None,'data':{}}
+        ret = {'code': '132', 'msg': None, 'data':{}}
         ret['msg'] = '获取收藏列表失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -1143,7 +1143,7 @@ def getStarList(request):
         retList.append(iJson)
     
     # ret msg
-    ret = {'code': '032', 'msg': None,'data':{}}
+    ret = {'code': '032', 'msg': None, 'data':{}}
     ret['msg'] = '获取收藏列表成功'
     ret['data'] = {
         'activityList': retList,
@@ -1207,7 +1207,7 @@ def saveTestData(request):
     # ticket.save()
     
     # ret msg
-    ret = {'code': '050', 'msg': None,'data':{}}
+    ret = {'code': '050', 'msg': None, 'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.openid,
