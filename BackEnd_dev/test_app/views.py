@@ -105,11 +105,11 @@ def verifyUser(request):
         student_id: flag to verify
     Returns: 
         {code: 101, msg: 认证失败，该用户不存在, data: {openid(str)}}
-        {code: 001, msg: 认证成功, data: {openid(str)}}
+        {code: 001, msg: 认证成功, data: {openid(str), student_id(str)}}
     '''
     # get openid & student_id
     openid = request.POST.get('openid')
-    
+
     try:
         student_id = request.POST.get('student_id')
     except:
@@ -143,6 +143,7 @@ def verifyUser(request):
     ret['msg'] = '认证成功'
     ret['data'] = {
         'openid': openid,
+        'student_id': student_id,
     }
     return JsonResponse(ret)
 
