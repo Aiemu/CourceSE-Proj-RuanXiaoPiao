@@ -63,8 +63,14 @@ urlpatterns = [
     # Part 6: admin
     path('admin/', admin.site.urls), # 管理 60
 
-    
-    # path('getTwo/', views.getTwo),
+    # Part 7: inspector & admin control
+    path('applyInspector/', views.applyInspector),
+    path('showAllApply/', views.showAllApply), # 超管专用
+    path('showApplyList/', views.showApplyList),
+    path('showInspectorList/', views.showInspectorList),
+
+
+    # path('test/', views.showAllApply)
 
 
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
