@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>软小票交付文档</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body class="vscode-light">
+        <h1 id="%e8%bd%af%e5%b0%8f%e7%a5%a8%e4%ba%a4%e4%bb%98%e6%96%87%e6%a1%a3">软小票交付文档</h1>
+<h2 id="%e6%88%90%e5%91%98">成员</h2>
+<p>涂亦驰 2017013579<br>
+邓博文 2017013582<br>
+朴铤浚 2015080120<br>
+曾正 2017011438</p>
+<h2 id="%e4%ba%a7%e5%93%81%e7%9b%ae%e6%a0%87">产品目标</h2>
+<ul>
+<li>为校园活动主办方提供方便公开的活动信息发布宣传平台</li>
+<li>方便学生直观地了解到近期感兴趣的活动并抢购活动票</li>
+<li>有利于校方进行活动管理</li>
+</ul>
+<h2 id="%e4%ba%a4%e4%bb%98%e4%ba%a7%e5%93%81">交付产品</h2>
+<h3 id="%e6%9c%8d%e5%8a%a1%e5%99%a8ip">服务器IP</h3>
+<p><code>IP: 62.234.50.47</code></p>
+<h3 id="%e5%b0%8f%e7%a8%8b%e5%ba%8f%e7%a0%81">小程序码</h3>
+<img src=https://tva1.sinaimg.cn/large/006tNbRwly1gaqm77kda5j30d40d4mx1.jpg width=150>
+<h3 id="%e7%ae%a1%e7%90%86%e5%91%98%e8%b4%a6%e5%8f%b7%e5%92%8c%e5%af%86%e7%a0%81">管理员账号和密码</h3>
+<p>账号: <code>superuser</code><br>
+密码: <code>dptzdptz</code></p>
+<h2 id="%e5%bc%80%e5%8f%91%e7%bb%84%e7%bb%87%e7%ae%a1%e7%90%86">开发组织管理</h2>
+<h3 id="%e8%bf%87%e7%a8%8b%e7%ae%a1%e7%90%86">过程管理</h3>
+<ul>
+<li>使用Git进行代码版本管理（<a href="https://github.com/Aiemu/CourceSE-Proj-RuanXiaoPaio">Github仓库</a>）</li>
+<li>每周六，在图书馆团体研讨间举行周例会，或在608自习室进行集体开发</li>
+<li>团队成员在微信群中保持紧密联系，利用闲暇时间开发，遇到问题或者需要合作时及时交流</li>
+</ul>
+<h3 id="%e4%ba%ba%e5%91%98%e5%88%86%e5%b7%a5">人员分工</h3>
+<ul>
+<li>
+<p>前端</p>
+<ul>
+<li>邓博文：实现个人主页的用户界面搭建，负责用户学生身份认证的跳转，完善优化了前端的界面显示</li>
+<li>朴铤浚：实现小程序首页(活动展示页面)、活动详情页面及部分个人页面的用户界面搭建。完善了滚图显示和前端检票功能。负责与后端对接和交流的工作</li>
+</ul>
+</li>
+<li>
+<p>后端</p>
+<ul>
+<li>涂亦驰：完成models设计，确定票据二维码的生成规范，实现活动缩略图、票据二维码的图片静态文件功能，实现活动热度计算推荐算法和检票系统</li>
+<li>曾正：后端response结构与状态码设计，实现后端与用户、活动、收藏、及部分票相关的函数，实现分词搜索算法，完成后端单元测试、基础性能测试、测试用前端，服务器部署配置</li>
+</ul>
+</li>
+</ul>
+<h3 id="%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83">开发环境</h3>
+<ul>
+<li>
+<p>前端</p>
+<ul>
+<li>vant-weapp 1.0.3</li>
+<li>Node.js 10.16.0</li>
+<li>微信开发者工具1.02</li>
+<li>调试基础库2.9.4</li>
+</ul>
+</li>
+<li>
+<p>后端</p>
+<ul>
+<li>Django 2.2.4</li>
+<li>Python 3.7</li>
+<li>MySQL 8.0.18</li>
+<li>nginx 1.14.0 (Ubuntu)</li>
+</ul>
+</li>
+</ul>
+<h3 id="%e9%85%8d%e7%bd%ae%e7%ae%a1%e7%90%86">配置管理</h3>
+<h2 id="%e7%b3%bb%e7%bb%9f%e8%ae%be%e8%ae%a1">系统设计</h2>
+<h3 id="%e5%89%8d%e7%ab%af%e4%ba%a4%e4%ba%92">前端交互</h3>
+<ol>
+<li>
+<p>首页</p>
+<ul>
+<li>从上到下分别是搜索框，滚动条，排序方式选择，活动列表</li>
+<li>搜索框中输入搜索内容返回搜索结果总数和搜索出来的活动列表</li>
+<li>滚动条实时滚动播放目前最火的活动的缩略图</li>
+<li>可以选择不排序或者按照热度或者按照时间排序</li>
+<li>活动列表列出了当前所有活动，并在列表项中展示了核心信息</li>
+<li>点击活动列表项则进入详情页，详情页详细展示活动的具体情况，并设有分享，收藏，购票与申请检票员四个按钮，收藏和购票后可以在用户主页中查看，申请检票员在后端审核成功后可进入用户主页的检票员入口</li>
+</ul>
+</li>
+<li>
+<p>用户主页</p>
+<ul>
+<li>从上到下分别是用户信息展示与检票员入口，收藏夹，所购票，认证按钮</li>
+<li>用户信息展示中头像和昵称来源于用户的微信头像和昵称，并显示当前用户是否已经认证</li>
+<li>点击我的收藏显示收藏的活动的列表，列表项显示核心信息，点击列表项进入详情页，详情页同时提供取消收藏的功能</li>
+<li>点击我的购票显示已购票的活动的列表，列表项提供核心信息和退票按钮，点击列表项进入票的详情页，票的详情页展示票的二维码和购票的具体时间等信息</li>
+<li>点击认证转到认证界面通过认证后回到小程序并修改用户信息的认证信息并隐藏认证按钮</li>
+<li>点击检票员入口进入检票页面，若无检票活动则提示并回退，否则有个扫码按钮和所管理的检票活动列表</li>
+</ul>
+</li>
+</ol>
+<h3 id="%e5%90%8e%e7%ab%af%e6%a8%a1%e5%9d%97">后端模块</h3>
+<p>后端采用<code>Django + MySQL</code>进行设计开发。<br>
+根据接口功能总共分为<strong>8</strong>大模块，各模块又分为数个小模块。<br>
+介绍如下（各接口详细的Args、Returns见文档<code>BackEnd_API.pdf</code>：</p>
+<ol>
+<li>Init<br>
+Intro: 包含与用户登录及认证相关的接口函数<br>
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">init</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用于用户在首次登录时认证
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">verifyUser</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用于用户的身份认证，即学号认证
+</span></div></code></pre>
+</li>
+<li>Activity<br>
+Intro: 包含有关活动各种操作的接口函数
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getActivityList</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+获取已有的活动列表（每一活动包含简单的信息），用于显示在首页界面
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getActivityInfo</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+获取该活动的详细信息（包括活动名，地点，时间等可公开的活动信息）
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getScrollActivity</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+获取最热门的5个未结束的活动，用于显示在首页的滚动条上（总活动数不足
+5个时则返回所有活动）
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">searchEngine</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+根据用户输入的内容，应用分词搜索所有活动的信息（标题、地点、主办
+方、简介等），并返回能够匹配的活动列表
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getTimeSortedActivity</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用于返回按时间排序的未结束的活动列表
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getHeatSortedActivity</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用于返回按热度排序的未结束的活动列表
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">addActivity</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用于添加新的活动
+'''</span>
+</div></code></pre>
+</li>
+<li>Ticket<br>
+Intro: 包含有关票的各种操作的接口函数
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">purchaseTicket</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用户购票接口，包括用户身份检查、活动检查、重复购票检查等，完成检查
+后生成一张新的票
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">refundTicket</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用户退票接口，包括用户身份检查、活动检查、重复退票检查等，完成检查
+后将票的 is_valid 属性置为False（为维护用户购票的记录不采用删除
+票的方式），表示该票已被退
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getTicketList</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+获取用户拥有的票的列表，包括已使用票、已退票
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getTicketInfo</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+获取该票的详情
+'''</span>
+</div></code></pre>
+</li>
+<li>Star<br>
+Intro: 包含有关收藏的各种操作的接口函数
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">starActivity</span><span class="hljs-params">(request)</span>:</span>
+<span class="hljs-string">'''
+用户收藏活动的接口，将活动添加到用户的收藏列表
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">deleteStar</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用户取消收藏的接口，将活动从用户的收藏的收藏列表中删除
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getStarList</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+获取该用户的收藏列表
+'''</span>
+</div></code></pre>
+</li>
+<li>Save test data<br>
+Intro: 包括有关向数据库中添加测试数据的接口函数
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">saveTestData</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+向数据库中添加初始测试数据
+'''</span>
+</div></code></pre>
+</li>
+<li>Index<br>
+Intro: 包含用于测试服务器启动状态的接口函数
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">index</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用于快速测试服务器的启动情况
+'''</span>
+</div></code></pre>
+</li>
+<li>Inspector &amp; admin control<br>
+Intro: 与检票、检票员、管理员有关的函数接口
+List:<pre><code class="language-python"><div><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">applyInspector</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+发送用户对成为活动检票员的申请
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">showAllApply</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+管理员确认接收到的用户申请记录
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">showApplyList</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用户查看自己发出的活动检票员申请记录
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">showInspectorList</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+用户确认自己的活动检票员身份
+'''</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">checkTicket</span><span class="hljs-params">(request)</span>:</span> 
+<span class="hljs-string">'''
+检票员入口扫描票据二维码的处理函数
+'''</span>
+</div></code></pre>
+</li>
+<li>Admin
+Intro: 用于管理端的启动</li>
+</ol>
+<h3 id="%e6%8e%a5%e5%8f%a3%e8%a7%84%e8%8c%83">接口规范</h3>
+<ol>
+<li>
+<p>前端 --&gt; 后端（<code>Requests</code>）
+前端向后端接口发送的请求中包含用于确认对象的信息，有以下5种类型：</p>
+<ul>
+<li><code>code</code>: 由微信服务器生成，发送给后端用于获取用户信息</li>
+<li><code>openid</code>: 用于确认用户</li>
+<li><code>student_id</code>: 用于用户认证，为用户对象的一个属性</li>
+<li><code>activity_id</code>: 用于确认活动</li>
+<li><code>ticket_id</code>: 用于确认票</li>
+</ul>
+</li>
+<li>
+<p>后端 --&gt; 前端（<code>Responses</code>）
+后端向前端发送的响应包含三部分：</p>
+<ul>
+<li><code>code</code>: 描述此次响应状态的参数<br>
+<code>code</code>（状态码）的设计方式如下：<br>
+状态码共<strong>三位</strong>，形如：<code>000</code>，<code>001</code><br>
+首位：状态描述，0为成功，1为用户异常，2为活动异常，3为票异常，4为其他异常<br>
+第二位：模块序号标记，标明当前为哪一个大模块<br>
+末位：模块中的函数序号，标明为模块中的哪一个函数</li>
+<li><code>msg</code>: 详细说明此次描述的状态，成功或错误信息</li>
+<li><code>data</code>: 如响应成功且正确为前端向后端请求的所有数据，否则为前端确认发送数据是否有误的确认数据</li>
+</ul>
+</li>
+</ol>
+<h3 id="%e6%95%b0%e6%8d%ae%e5%ba%93%e8%ae%be%e8%ae%a1">数据库设计</h3>
+<p>数据库采用<code>MySQL</code>。<br>
+数据库共包含为<strong>4</strong>张表，如下：</p>
+<ul>
+<li><code>Activity</code>: 用于存放所有活动信息的表，包含<code>activity_id</code>、<code>title</code>、<code>image</code>等与活动信息相关的列。其中<code>activity_id</code>为主键</li>
+<li><code>User</code>: 用于存放所有用户信息的表，包含<code>openid</code>、<code>username</code>、<code>student_id</code>等用户信息。其中<code>user_id</code>为主键。<code>User</code>中有两个多对多表(<code>ManyToManyField</code>)，一个用于实现用户的收藏列表，一个用于实现用户的可检票活动的列表</li>
+<li><code>Ticket</code>: 用于存放所有票的信息的表，包含<code>ticket_id</code>、<code>is_valid</code>等票的信息，其中<code>ticket_id</code>为主键。<code>Ticket</code>中有两个外键(<code>ForeignKey</code>)，分别用于标明该票的所有者以及对应的活动</li>
+<li><code>User_starred</code>: 由系统自动生成来存放用户收藏列表的表，是一个多对多表</li>
+</ul>
+<h2 id="%e9%87%8d%e9%9a%be%e7%82%b9%e5%8f%8a%e5%85%b6%e8%a7%a3%e5%86%b3">重难点及其解决</h2>
+<ul>
+<li>
+<p>前端</p>
+<ol>
+<li>小程序每个页面有很多生命周期函数，在写逻辑的时候需要仔细考虑应该在页面的那个周期中写逻辑，并且整个小程序本身也有生命周期当涉及到小程序跳转的时候也要考虑应该在什么时候实现跳转和返回数据的获取。</li>
+<li>在样式中熟练地使用<code>flex</code>能排版出比较好看的布局</li>
+<li>后端返回的数据是<code>string</code>格式，将<code>string</code>格式转换成<code>json</code>格式小程序才能正常操作。</li>
+<li>微信认证部分，说以前小程序可以一开始就弹出微信认证，现在必须得绑定在一个按钮上，为了这个而新建一个page感觉到很多余，然后就发现vant组件的弹窗里的按钮上可以绑定按钮事件，这就在比起开始进入一个界面，用弹窗更干净了。</li>
+<li>其实比起写代码，时间更多花在与后端队友们的交流上了，为了之后不出奇怪的问题，感到提前交流好非常重要，还好这方面所有组员们都很积极。</li>
+</ol>
+</li>
+<li>
+<p>后端</p>
+<ol>
+<li>model的设计存在较大的困难。<br>
+为解决多对多、一对多的属性，需要用到<code>ManyToManyField</code>、<code>ForeignKey</code>，其理解使用与管理有一定困难。</li>
+<li>服务器部署困难。<br>
+服务器在配置时使用<code>NGINX</code>，其使用不熟悉。服务器的<code>Django</code>版本与本地不一致，导致许多本地未出现的报错，直接在服务器修改代码不方便导致服务器配置初期出现了大量的<code>commit</code></li>
+</ol>
+</li>
+</ul>
+<h2 id="%e6%b5%8b%e8%af%95%e6%80%bb%e7%bb%93">测试总结</h2>
+<ul>
+<li>
+<p>后端</p>
+<ol>
+<li>单元测试（<code>Unit Test</code>）<br>
+原理：为后端所有模块中的接口函数编写了单元测试。测错方向包括用户错误、活动错误、票错误等。<br>
+测试方法：使用Django自带的单元测试模块编写测试代码。使用<code>coverage</code>计算覆盖率，使用<code>pip3 install coverage</code>安装</li>
+</ol>
+<ul>
+<li>
+<p>单元测试结果如下：<br>
+<img src=https://tva1.sinaimg.cn/large/006tNbRwly1gaqmkixbchj312i0d6dl9.jpg width=500></p>
+</li>
+<li>
+<p>覆盖率计算结果如下：<br>
+<img src=https://tva1.sinaimg.cn/large/006tNbRwly1gaql6uak1gj30uy0twaoo.jpg width=500></p>
+</li>
+</ul>
+<ol start="2">
+<li>
+<p>服务器响应性能测试<br>
+原理：循环向服务器发送请求，计算时间。<br>
+测试方法：使用脚本<code>PerformanceTest.py</code><br>
+测试结果如下：<br>
+<img src=https://tva1.sinaimg.cn/large/006tNbRwly1gaqlp0ed4bj30pi0ca7bf.jpg width=500>
+看见服务器基本能够保持<code>40requests/s</code>的请求处理速度，但会偶尔出现不稳定的情况，平均请求处理速度约为<code>24.7requests/s</code></p>
+</li>
+<li>
+<p>基础功能测试
+原理：在开发初期由于前端部分暂时无法提供用于测试的前端，为了保证后端开发的正常进行，出于微信小程序可能有特殊性的问题选择了开发后端测试用前端。<br>
+测试方法：每个按钮都会触发一个相应的后端接口函数，设计测试数据，逐个点击，检查返回结果<br>
+测试用前端界面如下：<br>
+<img src=https://tva1.sinaimg.cn/large/006tNbRwly1gaqlxkt7gij30hw0vm76g.jpg width=200>
+<img src=https://tva1.sinaimg.cn/large/006tNbRwly1gaqlzi8q36j30hu0vmwg9.jpg width=200></p>
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="%e7%b3%bb%e7%bb%9f%e9%83%a8%e7%bd%b2">系统部署</h2>
+<ol>
+<li><code>MySQL</code>配置</li>
+</ol>
+<pre><code class="language-shell"><div>sudo apt-get install mysql-server
+mysql -u root -p 123456
+create database test_db
+</div></code></pre>
+<ol start="2">
+<li><code>Python</code>配置</li>
+</ol>
+<pre><code class="language-shell"><div>pip3 install django
+pip3 install jieba
+pip3 install pandas
+pip3 install rest_frameworks
+pip3 install qrcode
+pip3 install pillow
+pip3 install pymysql
+</div></code></pre>
+<ol start="3">
+<li><code>Django</code>数据库初始化</li>
+</ol>
+<pre><code class="language-shell"><div>python3 manage.py makemigrations
+python3 manage.py migrate
+</div></code></pre>
+<ol start="4">
+<li><code>Nginx</code>安装</li>
+</ol>
+<pre><code class="language-shell"><div>sudo wget http://nginx.org/download/nginx-1.15.12.tar.gz 
+tar -zxvf nginx-1.15.12.tar.gz
+cd nginx-1.15.12
+</div></code></pre>
+<p>在<code>nginx</code>目录下修改配置文件<code>nginx.conf</code></p>
+<ol start="5">
+<li>运行</li>
+</ol>
+<pre><code class="language-shell"><div>nohup python3 manage.py runserver 127.0.0.1:8001 &amp;
+</div></code></pre>
+
+    </body>
+    </html>
