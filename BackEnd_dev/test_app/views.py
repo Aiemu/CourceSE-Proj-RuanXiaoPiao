@@ -64,7 +64,7 @@ def init(request):
     
     # if fail
     if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+        return JsonResponse(data={'code':response['errcode'], 'msg': response['errmsg']})
 
     # openid & session_key
     openid = response['openid']
@@ -537,13 +537,26 @@ def addActivity(request):
         place(str): activity place
         time(date): activity time
     Returns: 
-        {code: 015, msg: 获取按热度排序的活动列表成功, data: {activityList(list)}}
+        {code: 016, msg: 添加活动成功, data: {activity_id(int)}}
     '''
     title = request.POST.get('title')
     price = request.POST.get('price')
     place = request.POST.get('place')
-    time = request.POST.get('time')
-    # TODO
+    
+    activity, create = Activity.objects.get_or_create(title = title)
+
+    activity.price = price
+    activity.place = place
+
+    activity.save()
+    
+    # ret msg
+    ret = {'code': '016', 'msg': None, 'data':{}}
+    ret['msg'] = '添加活动成功'
+    ret['data'] = {
+        'activity_id': activity.activity_id,
+    }
+    return JsonResponse(ret)
 
 
 
@@ -871,6 +884,7 @@ def getTicketInfo(request):
     return JsonResponse(ret)
 
 
+
 '''
 Part 3
 Intro: Functions to operate star
@@ -1074,6 +1088,8 @@ def getStarList(request):
     }
     return JsonResponse(ret)
 
+
+
 '''
 Part 4
 Intro: Functions to save test data
@@ -1090,7 +1106,7 @@ def saveTestData(request):
     Args(request): 
         None
     Returns: 
-        {code: 050, msg: 保存成功, data: {newUser(str), newActivity(list)}}
+        {code: 040, msg: 保存成功, data: {newUser(str), newActivity(list)}}
     '''
     # test data for user
     openid = 'testOpenid'
@@ -1131,7 +1147,7 @@ def saveTestData(request):
     # ticket.save()
     
     # ret msg
-    ret = {'code': '050', 'msg': None, 'data':{}}
+    ret = {'code': '040', 'msg': None, 'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.openid,
@@ -1139,6 +1155,8 @@ def saveTestData(request):
         # 'newTicket': ticket.ticket_id,
     }
     return JsonResponse(ret)
+
+
 
 '''
 Part 5
@@ -1159,13 +1177,18 @@ def index(request):
     '''
     return HttpResponse("060\nHello! You are at the index page")
 
+
+
 '''
 Part 6
 Intro: Functions to deal with check tickets. Including help admin deal with inspectors.
-Num: Currently 2, perhaps grow.
+Num: 4
 List: 
     - checkTicket(request)
+    - applyInspector(request)
     - showAllApply(request)
+    - showApplyList(request),
+    - showInspectorList(request)
 '''
 
 # waiting to add sth
@@ -1177,10 +1200,10 @@ def checkTicket(request):
         ticket_id(int)
     Returns: 
         {}
-        {code: 324, msg: 检票失败，该票不存在, data: {user_id(int), activity_id(int)}}
-        {code: 224, msg: 检票失败，该活动已结束, data: {user_id(int), activity_id(int)}}
-        {code: 324, msg: 检票失败，该票已使用, data: {user_id(int), activity_id(int)}}
-        {code: 024, msg: 检票成功, data: {user_id(int), activity_id(int), ticket_id(int), student_id(str), time(date), place(str)}}
+        {code: 461, msg: 检票失败，该检票员不存在, data: {user_id(int), activity_id(int)}}
+        {code: 261, msg: 检票失败，该活动已结束, data: {user_id(int), activity_id(int)}}
+        {code: 361, msg: 检票失败，该票已使用, data: {user_id(int), activity_id(int)}}
+        {code: 061, msg: 检票成功, data: {user_id(int), activity_id(int), ticket_id(int), student_id(str), time(date), place(str)}}
     '''
     # get inspector info
     inspector_id = request.POST.get('inspector_id')
