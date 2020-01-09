@@ -174,4 +174,46 @@ Page({
             }
         })
     },
+    onClickInspector(e) {
+        let that = this
+        Dialog.confirm({
+            title: '确认申请检票员',
+            message: '确认要申请 ' + that.data.activityDetail.basicInfo.title + ' 的检票员吗?'
+            }).then(() => {
+                // on confirm
+                that.applyInspector()
+            }).catch(() => {
+                // on cancel
+            })
+    },
+    applyInspector() {
+        let that = this
+        var postData = {
+            openid: app.globalData.openId,
+            activity_id: Number(that.activityId)
+        }
+        console.log(postData)
+        wx.request({
+            url: 'http://62.234.50.47/applyInspector/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                //回调处理
+                console.log('getOpenID-OK!');
+                console.log(res.data);
+                if(res.data.code == "030") {
+                    Toast.success(res.data.msg)
+                }
+                else {
+                    Toast.fail(res.data.msg)
+                }
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
+    },
 })

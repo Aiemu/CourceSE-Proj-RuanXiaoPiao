@@ -6,7 +6,8 @@
     "pages/my_order/my_order",
     "pages/my_collect/my_collect",
     "pages/activity-details/activity-details",
-    "pages/search/search"
+    "pages/search/search",
+    "pages/my_inspector/my_inspector"
   ],
   "window": {
     "backgroundTextStyle": "light",

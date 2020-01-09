@@ -110,6 +110,12 @@ Page({
     })
   },
 
+  myInspector: function(){
+    wx.navigateTo({
+      url: '../my_inspector/my_inspector',
+    })
+  },
+
   myProfile: function(){
     wx.navigateTo({
       url: '../profile/profile',

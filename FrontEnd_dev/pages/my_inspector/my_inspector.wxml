@@ -1,0 +1,11 @@
+<van-toast id="van-toast" />
+<van-dialog id="van-dialog" />
+<view class="btn">
+  <van-button type="danger" size="large" bindtap="tapQrButton">点击扫码检票</van-button>
+</view>
+
+<van-cell-group>
+<view wx:for="{{inspectorList}}" wx:for-item="activity" wx:key="id" data-id="activity.activity_id">
+  <van-cell title="{{activity.title}}" value="{{activity.status}}" label="{{activity.time}}\\n{{activity.place}}" />
+</view>
+</van-cell-group>
