@@ -76,7 +76,7 @@
 ### 后端模块
 后端采用`Django + MySQL`进行设计开发。  
 根据接口功能总共分为**8**大模块，各模块又分为数个小模块。  
-介绍如下（各接口详细的Args、Returns见文档`BackEnd_API.pdf`：
+介绍如下（各接口详细的Args、Returns见文档`BackEnd_API.md`：
 1. Init  
    Intro: 包含与用户登录及认证相关的接口函数  
    List: 
