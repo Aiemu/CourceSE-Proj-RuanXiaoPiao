@@ -25,6 +25,10 @@
   flex-direction: column;
   justify-content: space-between;
 }
+.inspector{
+  position: absolute;
+  right: 10rpx;
+}
 .logo{
   overflow: hidden;
   display: block;
@@ -53,5 +57,7 @@
 
 .btn_verify{
   margin-top: 20rpx;
-  background-color: gray;
+  margin-left: 10rpx;
+  margin-right: 10rpx;
+  background-color: #2ecc71;
 }

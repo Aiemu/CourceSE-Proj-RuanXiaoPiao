@@ -126,7 +126,7 @@ Page({
             tmpUrl = "http://62.234.50.47/getTimeSortedActivity/"
         }
         else if(index == 2) {
-            tmpUrl = "http://62.234.50.47/getTimeSortedActivity/"
+            tmpUrl = "http://62.234.50.47/getHeatSortedActivity/"
         }
         // index == 0时，所有活动不需要请求
         else {
@@ -146,6 +146,17 @@ Page({
                     list[i].heat = Math.ceil(list[i].heat)
                 }
                 if(index == 1) {
+                    list = list.reverse()
+                    let len = list.length
+                    for(let i = 0; i < len; i++) {
+                        if(list[i].status == "已结束") {
+                            let temp = list[i]
+                            list.splice(i,1)
+                            list.push(temp)
+                            i--
+                            len--
+                        }
+                    }
                     that.setData({
                         timeSortedList: list
                     })

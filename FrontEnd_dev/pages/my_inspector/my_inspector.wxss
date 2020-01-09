@@ -1,0 +1,6 @@
+.btn{
+    margin-top: 100rpx;
+    margin-bottom: 100rpx;
+    margin-left: 20rpx;
+    margin-right: 20rpx;
+  }
