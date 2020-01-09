@@ -1226,22 +1226,22 @@ def checkTicket(request):
         }
         return JsonResponse(ret)
     
-    # check if this inspector is of this activity
-    check = False
-    for item in inspector.inspector_list.all():
-        if item.activity_id == activity_id:
-            check = True
-            break
-    if not check:
-        # ret msg
-        ret = {'code': '224', 'msg': None, 'data':{}}
-        ret['msg'] = '该检票员不属于该活动'
-        ret['data'] = {
-            'inspector_id': inspector_id,
-            'user_id': user_id,
-            'activity_id': activity_id,
-        }
-        return JsonResponse(ret)
+    # # check if this inspector is of this activity
+    # check = False
+    # for item in inspector.inspector_list.all():
+    #     if item.activity_id == activity_id:
+    #         check = True
+    #         break
+    # if not check:
+    #     # ret msg
+    #     ret = {'code': '224', 'msg': None, 'data':{}}
+    #     ret['msg'] = '该检票员不属于该活动'
+    #     ret['data'] = {
+    #         'inspector_id': inspector_id,
+    #         'user_id': user_id,
+    #         'activity_id': activity_id,
+    #     }
+    #     return JsonResponse(ret)
     
     # inspector checked
     # get ticket
