@@ -1,7 +1,10 @@
 /* pages/ticket/ticket.wxss */
 .t{
   text-align: center;
+<<<<<<< HEAD
 }
 .qrcode{
   text-align: center;
+=======
+>>>>>>> back-end-dev
 }

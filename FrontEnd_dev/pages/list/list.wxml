@@ -13,13 +13,22 @@
 </view>
 <view>
     <swiper indicator-dots="true" indicator-active-color="#fff" autoplay circular>
+<<<<<<< HEAD
         <swiper-item  wx:for="{{banners}}" wx:key="" data-id="{{item.activity_id}}" bindtap="toDetailsTap">
             <van-image width="100%" height="100%" fit="fill" src="{{item.image}}"/>
+=======
+        <swiper-item wx:for="{{banners}}" wx:key="">
+            <van-image width="10rem" height="10rem" fit="contain" src="{{item.image}}"/>
+>>>>>>> back-end-dev
         </swiper-item>
     </swiper>
 </view>
 <view>
+<<<<<<< HEAD
     <van-tabs bind:click="getSortedList">
+=======
+    <van-tabs>
+>>>>>>> back-end-dev
     <van-tab title="全部">
         <view class="activity" wx:for="{{activityList}}" wx:for-item="activity" wx:key="id" data-id="{{activity.activity_id}}" bindtap="toDetailsTap">  
             <image class="post" src="{{activity.image}}"></image>
@@ -29,6 +38,10 @@
                 <text class="location">{{activity.place}}</text>
                 <text class="sponsor">{{activity.publisher}}</text>
                 <view class="lastline">
+<<<<<<< HEAD
+=======
+                  <!--TODO: 添加状态内容 -->
+>>>>>>> back-end-dev
                   <text class="state">{{activity.status}}</text>
                   <text wx:if="{{activity.price}}" class ="price">{{activity.price}}元</text>
                   <text class="hot">{{activity.heat}}</text>
@@ -36,6 +49,7 @@
             </view>
         </view>
     </van-tab>
+<<<<<<< HEAD
     <van-tab title="最近">
         <view class="activity" wx:for="{{timeSortedList}}" wx:for-item="activity" wx:key="id" data-id="{{activity.activity_id}}" bindtap="toDetailsTap">  
             <image class="post" src="{{activity.image}}"></image>
@@ -68,5 +82,9 @@
             </view>
         </view>
     </van-tab>
+=======
+    <van-tab title="筛选1">内容 2</van-tab>
+    <van-tab title="筛选2">内容 3</van-tab>
+>>>>>>> back-end-dev
     </van-tabs>
  </view>

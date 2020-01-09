@@ -21,6 +21,53 @@ Page({
         })
     },
 
+<<<<<<< HEAD
+=======
+    getTimeActivityList: function () {
+        var postData = {
+            str: 'get list',
+        };
+        wx.request({
+            // url: 'http://62.234.50.47/getActivityList/',
+            url: 'http://62.234.50.47/getTimeSortedActivity/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                console.log('getTimeList-OK!');
+                console.log(res.data);
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
+    },
+
+    getHeatActivityList: function () {
+        var postData = {
+            str: 'get list',
+        };
+        wx.request({
+            // url: 'http://62.234.50.47/getActivityList/',
+            url: 'http://62.234.50.47/getHeatSortedActivity/',
+            data: postData,
+            method: 'POST',
+            header: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+            },
+            success: function (res) {
+                console.log('getHeatList-OK!');
+                console.log(res.data);
+            },
+            fail: function (error) {
+                console.log(error);
+            }
+        })
+    },
+
+>>>>>>> back-end-dev
     getScrollActivity: function () {
         var postData = {
             str: 'get list'

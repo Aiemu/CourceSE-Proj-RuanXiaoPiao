@@ -12,6 +12,8 @@ import datetime
 import jieba
 import re
 import qrcode
+import random
+import string
 
 # from django.conf import settings
 from PIL import Image
@@ -62,7 +64,7 @@ def init(request):
     
     # if fail
     if 'errcode' in response:
-        return Response(data={'code':response['errcode'], 'msg': response['errmsg']})
+        return JsonResponse(data={'code':response['errcode'], 'msg': response['errmsg']})
 
     # openid & session_key
     openid = response['openid']
@@ -85,7 +87,7 @@ def init(request):
     jwt = jwt_encode_handler(payload)
 
     # ret msg
-    ret = {'code': '000', 'msg': None,'data':{}}
+    ret = {'code': '000', 'msg': None, 'data':{}}
     ret['msg'] = '授权成功'
     ret['data'] = {
         'jwt': jwt,
@@ -100,18 +102,28 @@ def verifyUser(request):
         update user's is_verified
     Args(request): 
         openid(str): used to identify user
+        student_id: flag to verify
     Returns: 
         {code: 101, msg: 认证失败，该用户不存在, data: {openid(str)}}
-        {code: 001, msg: 认证成功, data: {openid(str)}}
+        {code: 001, msg: 认证成功, data: {openid(str), student_id(str)}}
     '''
-    # get openid
+    # get openid & student_id
     openid = request.POST.get('openid')
+    student_id = request.POST.get('student_id')
+
+    if student_id == None:
+        ret = {'code': '401', 'msg': None, 'data':{}}
+        ret['msg'] = '认证失败，无学号'
+        ret['data'] = {
+            'openid': openid,
+        }
+        return JsonResponse(ret)
 
     # get user
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '101', 'msg': None,'data':{}}
+        ret = {'code': '101', 'msg': None, 'data':{}}
         ret['msg'] = '认证失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -120,15 +132,17 @@ def verifyUser(request):
     
     # update user
     user.is_verified = True
+    user.student_id = student_id
 
     # save
     user.save()
 
     # ret msg
-    ret = {'code': '001', 'msg': None,'data':{}}
+    ret = {'code': '001', 'msg': None, 'data':{}}
     ret['msg'] = '认证成功'
     ret['data'] = {
         'openid': openid,
+        'student_id': student_id,
     }
     return JsonResponse(ret)
 
@@ -137,12 +151,15 @@ def verifyUser(request):
 '''
 Part 1
 Intro: Functions to operate activity
-Num: 4
+Num: 7
 List: 
     - getActivityList(request)
     - getActivityInfo(request)
     - getScrollActivity(request)
     - searchEngine(request)
+    - getTimeSortedActivity(request)
+    - getHeatSortedActivity(request)
+    - addActivity(request)
 '''
 
 def getActivityList(request): 
@@ -198,7 +215,7 @@ def getActivityList(request):
         retList.append(iJson)
     
     # ret msg
-    ret = {'code': '010', 'msg': None,'data':{}}
+    ret = {'code': '010', 'msg': None, 'data':{}}
     ret['msg'] = '获取活动列表成功'
     ret['data'] = {
         'activityList': retList,
@@ -226,7 +243,7 @@ def getActivityInfo(request):
     try: 
         activity = Activity.objects.get(activity_id = activity_id)
     except:
-        ret = {'code': '211', 'msg': None,'data':{}}
+        ret = {'code': '211', 'msg': None, 'data':{}}
         ret['msg'] = '获取活动详情失败，该活动不存在'
         ret['data'] = {
             'activity_id': activity_id,
@@ -238,7 +255,7 @@ def getActivityInfo(request):
     activity.save()
 
     # ret msg
-    ret = {'code': '011', 'msg': None,'data':{}}
+    ret = {'code': '011', 'msg': None, 'data':{}}
     ret['msg'] = '活动详情获取成功'
     ret['data'] = {
         'activity_id': activity_id,
@@ -302,7 +319,7 @@ def getScrollActivity(request):
             break
     
     # ret msg
-    ret = {'code': '012', 'msg': None,'data':{}}
+    ret = {'code': '012', 'msg': None, 'data':{}}
     ret['msg'] = '获取滚图成功'
     ret['data'] = {
         'activityList': retList,
@@ -383,10 +400,161 @@ def searchEngine(request):
         retactList.append(iJson)
 
     # ret
-    ret = {'code': '013', 'msg': None,'data':{}}
+    ret = {'code': '013', 'msg': None, 'data':{}}
     ret['msg'] = '搜索成功'
     ret['data'] = {
         'actList': retactList,
+    }
+    return JsonResponse(ret)
+
+def getTimeSortedActivity(request): 
+    '''
+    Intro: 
+        return activities sorted by time
+    Args(request): 
+        None
+    Returns: 
+        {code: 014, msg: 获取按时间排序的活动列表成功, data: {activityList(list)}}
+    '''
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    # get list
+    actList = Activity.objects.filter(min_heat=0).order_by('-time')
+    retList = []
+
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        
+        # save
+        item.save() 
+
+        # create json
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            'image': 'http://62.234.50.47' + item.image.url,
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price,
+            'heat': item.heat,
+        }
+
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '014', 'msg': None, 'data':{}}
+    ret['msg'] = '获取按时间排序的活动列表成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)
+
+def getHeatSortedActivity(request): 
+    '''
+    Intro: 
+        return activities sorted by heat
+    Args(request): 
+        None
+    Returns: 
+        {code: 015, msg: 获取按热度排序的活动列表成功, data: {activityList(list)}}
+    '''
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    # get list
+    actList = Activity.objects.filter(min_heat=0).order_by('-heat')
+    retList = []
+
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+        
+        # save
+        item.save() 
+
+        # create json
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            'image': 'http://62.234.50.47' + item.image.url,
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price,
+            'heat': item.heat,
+        }
+
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '015', 'msg': None, 'data':{}}
+    ret['msg'] = '获取按热度排序的活动列表成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)
+
+def addActivity(request): 
+    '''
+    Intro: 
+        add activity into database
+    Args(request): 
+        title(str): activity title
+        price(double): activity price
+        place(str): activity place
+        time(date): activity time
+    Returns: 
+        {code: 016, msg: 添加活动成功, data: {activity_id(int)}}
+    '''
+    title = request.POST.get('title')
+    price = request.POST.get('price')
+    place = request.POST.get('place')
+    
+    activity, create = Activity.objects.get_or_create(title = title)
+
+    activity.price = price
+    activity.place = place
+
+    activity.save()
+    
+    # ret msg
+    ret = {'code': '016', 'msg': None, 'data':{}}
+    ret['msg'] = '添加活动成功'
+    ret['data'] = {
+        'activity_id': activity.activity_id,
     }
     return JsonResponse(ret)
 
@@ -401,7 +569,6 @@ List:
     - refundTicket(request)
     - getTicketList(request)
     - getTicketInfo(request)
-    - checkTicket(request)
 '''
 
 def purchaseTicket(request): 
@@ -427,7 +594,7 @@ def purchaseTicket(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '120', 'msg': None,'data':{}}
+        ret = {'code': '120', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -437,7 +604,7 @@ def purchaseTicket(request):
 
     # check if user is verified
     if not user.is_verified: 
-        ret = {'code': '120', 'msg': None,'data':{}}
+        ret = {'code': '120', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，该用户未认证'
         ret['data'] = {
             'openid': openid,
@@ -449,7 +616,7 @@ def purchaseTicket(request):
     try: 
         activity = Activity.objects.get(activity_id = activity_id)
     except:
-        ret = {'code': '220', 'msg': None,'data':{}}
+        ret = {'code': '220', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，该活动不存在'
         ret['data'] = {
             'openid': openid,
@@ -460,7 +627,7 @@ def purchaseTicket(request):
     # check remain
     if activity.remain <= 0:
         # ret msg
-        ret = {'code': '320', 'msg': None,'data':{}}
+        ret = {'code': '320', 'msg': None, 'data':{}}
         ret['msg'] = '购票失败，余票不足'
         ret['data'] = {
             'openid': openid,
@@ -477,7 +644,7 @@ def purchaseTicket(request):
                 # check is_valid
                 if i.activity == activity and i.is_valid:
                     #ret msg
-                    ret = {'code': '320', 'msg': None,'data':{}}
+                    ret = {'code': '320', 'msg': None, 'data':{}}
                     ret['msg'] = '购票失败，票已存在'
                     ret['data'] = {
                         'openid': openid,
@@ -499,13 +666,49 @@ def purchaseTicket(request):
         ticket = Ticket(owner = user, activity = activity)
         
         # verify ticket
-        ticket.is_valid = True 
+        ticket.is_valid = True
+
+        # define QRCode mode
+        qr = qrcode.QRCode(
+            version=5,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=8,
+            border=4,
+        )
+        # get random mark as part of the url
+        letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+        url = "RuanXiaoPiao_Unique: "
+        for i in range(3):
+            url = url + random.choice(letters) + " + "
+        url = url + str(user.user_id) + " + " + str(activity.activity_id)
+        qr.add_data(url)
+        qr.make(fit=True)
+        img = qr.make_image()
+        img = img.convert("RGBA")
+        icon = Image.open('media/logo.png')
+        img_w, img_h = img.size
+        factor = 4
+        size_w = int(img_w / factor)
+        size_h = int(img_h / factor)
+        icon_w, icon_h = icon.size
+        if icon_w >size_w:
+            icon_w = size_w
+        if icon_h > size_h:
+            icon_h = size_h
+        icon = icon.resize((icon_w,icon_h),Image.ANTIALIAS)
+        w = int((img_w - icon_w) / 2)
+        h = int((img_h - icon_h) / 2)
+        icon = icon.convert("RGBA")
+        img.paste(icon, (w, h), icon)
+
+        img.save('media/QR/' + str(user.user_id) + '_' + str(activity.activity_id) +'.png')
+        ticket.QRCode = 'QR/' + str(user.user_id) + '_' + str(activity.activity_id) +'.png'
 
         # save ticket
         ticket.save()
         
         # ret msg
-        ret = {'code': '020', 'msg': None,'data':{}}
+        ret = {'code': '020', 'msg': None, 'data':{}}
         ret['msg'] = '购票成功'
         ret['data'] = {
             'openid': openid,
@@ -534,7 +737,7 @@ def refundTicket(request):
         activity = ticket.activity
     except: 
         # ret msg
-        ret = {'code': '321', 'msg': None,'data':{}}
+        ret = {'code': '321', 'msg': None, 'data':{}}
         ret['msg'] = '退票失败，该票不存在'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -557,7 +760,7 @@ def refundTicket(request):
         ticket.save()
 
         # ret msg
-        ret = {'code': '021', 'msg': None,'data':{}}
+        ret = {'code': '021', 'msg': None, 'data':{}}
         ret['msg'] = '退票成功'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -566,7 +769,7 @@ def refundTicket(request):
 
     else:
         # ret msg
-        ret = {'code': '321', 'msg': None,'data':{}}
+        ret = {'code': '321', 'msg': None, 'data':{}}
         ret['msg'] = '退票失败，该票为已退票状态'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -599,7 +802,7 @@ def getTicketList(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '122', 'msg': None,'data':{}}
+        ret = {'code': '122', 'msg': None, 'data':{}}
         ret['msg'] = '获取已购票列表失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -628,7 +831,7 @@ def getTicketList(request):
         retList.append(iJson)
 
     # ret msg
-    ret = {'code': '022', 'msg': None,'data':{}}
+    ret = {'code': '022', 'msg': None, 'data':{}}
     ret['msg'] = '获取已购票列表成功'
     ret['data'] = {
         'openid': openid,
@@ -656,7 +859,7 @@ def getTicketInfo(request):
     try:
         ticket = Ticket.objects.get(ticket_id = ticket_id)
     except:
-        ret = {'code': '323', 'msg': None,'data':{}}
+        ret = {'code': '323', 'msg': None, 'data':{}}
         ret['msg'] = '获取票详情失败，该票不存在'
         ret['data'] = {
             'ticket_id': ticket_id,
@@ -664,7 +867,7 @@ def getTicketInfo(request):
         return JsonResponse(ret)
 
     # ret msg
-    ret = {'code': '023', 'msg': None,'data':{}}
+    ret = {'code': '023', 'msg': None, 'data':{}}
     ret['msg'] = '获取票详情成功'
     ret['data'] = {
         'ticket_id': ticket_id,
@@ -676,69 +879,7 @@ def getTicketInfo(request):
         'tic_time': ticket.purchaseTime,
         'act_time': ticket.activity.time,
         'is_valid': ticket.is_valid,
-        # 'QRCode': ticket.QRCode,
-    }
-    return JsonResponse(ret)
-
-def checkTicket(request): 
-    '''
-    Intro: 
-        check ticket in check-ticket end
-    Args(request): 
-        ticket_id(int)
-    Returns: 
-        {code: 324, msg: 检票失败，该票不存在, data: {ticket_id(int)}}
-        {code: 224, msg: 检票失败，该活动已结束, data: {ticket_id(int)}}
-        {code: 324, msg: 检票失败，该票已使用, data: {ticket_id(int)}}
-        {code: 024, msg: 检票成功, data: {ticket_id(int)}}
-    '''
-    # get ticket_id
-    ticket_id = request.POST.get('ticket_id')
-
-    # get ticket
-    try: 
-        ticket = Ticket.objects.get(ticket_id = ticket_id)
-
-    except:
-        # ret msg
-        ret = {'code': '324', 'msg': None,'data':{}}
-        ret['msg'] = '检票失败，该票不存在'
-        ret['data'] = {
-            'ticket_id': ticket_id
-        }
-        return JsonResponse(ret)
-
-    # check time
-    if ticket.activity.status == u'已结束': 
-        # ret msg
-        ret = {'code': '224', 'msg': None,'data':{}}
-        ret['msg'] = '检票失败，该活动已结束'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-        }
-        return JsonResponse(ret)
-
-    # check ticket
-    if ticket.is_checked: 
-        # ret msg
-        ret = {'code': '324', 'msg': None,'data':{}}
-        ret['msg'] = '检票失败，该票已使用'
-        ret['data'] = {
-            'ticket_id': ticket_id,
-        }
-        return JsonResponse(ret)
-
-    # update
-    ticket.is_checked = True
-
-    # save
-    ticket.save()
-
-    # ret msg
-    ret = {'code': '024', 'msg': None,'data':{}}
-    ret['msg'] = '检票成功'
-    ret['data'] = {
-        'ticket_id': ticket_id, 
+        'QRCode': 'http://62.234.50.47' + ticket.QRCode.url,
     }
     return JsonResponse(ret)
 
@@ -776,7 +917,7 @@ def starActivity(request):
 
     except:
         # ret msg
-        ret = {'code': '130', 'msg': None,'data':{}}
+        ret = {'code': '130', 'msg': None, 'data':{}}
         ret['msg'] = '收藏失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -790,7 +931,7 @@ def starActivity(request):
 
     except:
         # ret msg
-        ret = {'code': '230', 'msg': None,'data':{}}
+        ret = {'code': '230', 'msg': None, 'data':{}}
         ret['msg'] = '收藏失败，该活动不存在'
         ret['data'] = {
             'openid': openid,
@@ -808,7 +949,7 @@ def starActivity(request):
     activity.save()
 
     # ret msg
-    ret = {'code': '030', 'msg': None,'data':{}}
+    ret = {'code': '030', 'msg': None, 'data':{}}
     ret['msg'] = '收藏成功'
     ret['data'] = {
         'openid': openid,
@@ -837,7 +978,7 @@ def deleteStar(request):
         user = User.objects.get(openid = openid)
 
     except: 
-        ret = {'code': '131', 'msg': None,'data':{}}
+        ret = {'code': '131', 'msg': None, 'data':{}}
         ret['msg'] = '取消收藏失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -850,7 +991,7 @@ def deleteStar(request):
         activity = Activity.objects.get(activity_id = activity_id)
 
     except: 
-        ret = {'code': '231', 'msg': None,'data':{}}
+        ret = {'code': '231', 'msg': None, 'data':{}}
         ret['msg'] = '取消收藏失败，该活动不存在'
         ret['data'] = {
             'openid': openid,
@@ -867,7 +1008,7 @@ def deleteStar(request):
     activity.save()
 
     # ret msg
-    ret = {'code': '031', 'msg': None,'data':{}}
+    ret = {'code': '031', 'msg': None, 'data':{}}
     ret['msg'] = '取消收藏成功'
     ret['data'] = {
         'openid': openid,
@@ -892,7 +1033,7 @@ def getStarList(request):
     try: 
         user = User.objects.get(openid = openid)
     except:
-        ret = {'code': '132', 'msg': None,'data':{}}
+        ret = {'code': '132', 'msg': None, 'data':{}}
         ret['msg'] = '获取收藏列表失败，该用户不存在'
         ret['data'] = {
             'openid': openid,
@@ -940,7 +1081,7 @@ def getStarList(request):
         retList.append(iJson)
     
     # ret msg
-    ret = {'code': '032', 'msg': None,'data':{}}
+    ret = {'code': '032', 'msg': None, 'data':{}}
     ret['msg'] = '获取收藏列表成功'
     ret['data'] = {
         'activityList': retList,
@@ -951,93 +1092,6 @@ def getStarList(request):
 
 '''
 Part 4
-Intro: Function to operate QRCode
-Num: 2
-List: 
-    - testQRCode(request)
-    - logo(request)
-'''
-
-def testQRCode(request): 
-    '''
-    Intro: 
-        
-    Args(request): 
-        
-    Returns: 
-        {code: , msg: , data: {}}
-    '''
-    test_ticket = Ticket.objects.get(ticket_id = 20)
-
-    # create new QRCode
-    qr = qrcode.QRCode(
-        version=None,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=2,
-    )
-    url='another_test_qrcode'
-    qr.add_data(url)
-    qr.make(fit=True)
-    img = qr.make_image()
-    img.save('media/QR/test_qrcode.png')
-    test_ticket.QRCode = 'QR/test_qrcode.png'
-    test_ticket.save()
-    '''
-    ERROR_CORRECT_L: 大约7%或更少的错误能被纠正
-    ERROR_CORRECT_M:（默认）大约15%或更少的错误能被纠正
-    ROR_CORRECT_H:大约30%或更少的错误能被纠正
-    '''
-    return HttpResponse(test_ticket.QRCode.url)
-
-def logo(request): 
-    '''
-    Intro: 
-        
-    Args(request): 
-        
-    Returns: 
-        {code: , msg: , data: {}}
-    '''
-    test_ticket = Ticket.objects.get(ticket_id = 20)
-    # create new QRCode
-    qr = qrcode.QRCode(
-        version=5,
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=8,
-        border=4,
-    )
-    url='logo_qrcode'
-    qr.add_data(url)
-    qr.make(fit=True)
-    img = qr.make_image()
-    img = img.convert("RGBA")
-    icon = Image.open('media/logo.png')
-    img_w, img_h = img.size
-    factor = 4
-    size_w = int(img_w / factor)
-    size_h = int(img_h / factor)
-    icon_w, icon_h = icon.size
-    if icon_w >size_w:
-        icon_w = size_w
-    if icon_h > size_h:
-        icon_h = size_h
-    icon = icon.resize((icon_w,icon_h),Image.ANTIALIAS)
-    w = int((img_w - icon_w) / 2)
-    h = int((img_h - icon_h) / 2)
-    icon = icon.convert("RGBA")
-    img.paste(icon, (w, h), icon)
-
-    img.save('media/QR/test_qrcode.png')
-    test_ticket.QRCode = 'QR/test_qrcode.png'
-    test_ticket.save()
-
-    return HttpResponse(test_ticket.QRCode.url)
-
-
-
-'''
-Part 5
 Intro: Functions to save test data
 Num: 1
 List: 
@@ -1052,7 +1106,7 @@ def saveTestData(request):
     Args(request): 
         None
     Returns: 
-        {code: 050, msg: 保存成功, data: {newUser(str), newActivity(list)}}
+        {code: 040, msg: 保存成功, data: {newUser(str), newActivity(list)}}
     '''
     # test data for user
     openid = 'testOpenid'
@@ -1093,7 +1147,7 @@ def saveTestData(request):
     # ticket.save()
     
     # ret msg
-    ret = {'code': '050', 'msg': None,'data':{}}
+    ret = {'code': '040', 'msg': None, 'data':{}}
     ret['msg'] = '保存成功'
     ret['data'] = {
         'newUser': user.openid,
@@ -1105,7 +1159,7 @@ def saveTestData(request):
 
 
 '''
-Part 6
+Part 5
 Intro: Function to show page for testing net connect
 Num: 1
 List: 
@@ -1122,3 +1176,354 @@ def index(request):
         None
     '''
     return HttpResponse("060\nHello! You are at the index page")
+
+
+
+'''
+Part 6
+Intro: Functions to deal with check tickets. Including help admin deal with inspectors.
+Num: 4
+List: 
+    - checkTicket(request)
+    - applyInspector(request)
+    - showAllApply(request)
+    - showApplyList(request),
+    - showInspectorList(request)
+'''
+
+# waiting to add sth
+def checkTicket(request): 
+    '''
+    Intro: 
+        check ticket in check-ticket end
+    Args(request): 
+        ticket_id(int)
+    Returns: 
+        {}
+        {code: 461, msg: 检票失败，该检票员不存在, data: {user_id(int), activity_id(int)}}
+        {code: 261, msg: 检票失败，该活动已结束, data: {user_id(int), activity_id(int)}}
+        {code: 361, msg: 检票失败，该票已使用, data: {user_id(int), activity_id(int)}}
+        {code: 061, msg: 检票成功, data: {user_id(int), activity_id(int), ticket_id(int), student_id(str), time(date), place(str)}}
+    '''
+    # get inspector info
+    inspector_id = request.POST.get('inspector_id')
+
+    # get ticket info
+    user_id = request.POST.get('user_id')
+    activity_id = request.POST.get('activity_id')
+
+    # check inspector identity
+    try:
+        inspector = User.objects.get(openid = inspector_id)
+    except:
+        # ret msg
+        ret = {'code': '224', 'msg': None, 'data':{}}
+        ret['msg'] = '不存在的检票员'
+        ret['data'] = {
+            'inspector_id': inspector_id,
+            'user_id': user_id,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+    
+    # check if this inspector is of this activity
+    check = False
+    for item in inspector.inspector_list.all():
+        if item.activity_id == activity_id:
+            check = True
+            break
+    if not check:
+        # ret msg
+        ret = {'code': '224', 'msg': None, 'data':{}}
+        ret['msg'] = '该检票员不属于该活动'
+        ret['data'] = {
+            'inspector_id': inspector_id,
+            'user_id': user_id,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+    
+    # inspector checked
+    # get ticket
+    try:
+        tickets = Ticket.objects.all()
+        found = False
+        for item in tickets:
+            if item.owner.user_id == user_id:
+                if item.activity.activity_id == activity_id:
+                    found = True
+                    ticket = item
+                    break
+
+        if not found:
+            # ret msg
+            ret = {'code': '324', 'msg': None, 'data':{}}
+            ret['msg'] = '检票失败，该票不存在'
+            ret['data'] = {
+                'inspector_id': inspector_id,
+                'user_id': user_id,
+                'activity_id': activity_id,
+            }
+            return JsonResponse(ret)
+        else:
+            # check time
+            if ticket.activity.status == u'已结束': 
+                # ret msg
+                ret = {'code': '224', 'msg': None, 'data':{}}
+                ret['msg'] = '检票失败，该活动已结束'
+                ret['data'] = {
+                    'inspector_id': inspector_id,
+                    'user_id': user_id,
+                    'activity_id': activity_id,
+                }
+                return JsonResponse(ret)
+
+            # check ticket
+            if ticket.is_checked: 
+                # ret msg
+                ret = {'code': '324', 'msg': None, 'data':{}}
+                ret['msg'] = '检票失败，该票已使用'
+                ret['data'] = {
+                    'inspector_id': inspector_id,
+                    'user_id': user_id,
+                    'activity_id': activity_id,
+                }
+                return JsonResponse(ret)
+
+            # update
+            ticket.is_checked = True
+
+            # save
+            ticket.save()
+
+            # ret msg
+            ret = {'code': '024', 'msg': None, 'data':{}}
+            ret['msg'] = '检票成功'
+            ret['data'] = {
+                'inspector_id': inspector_id,
+                'user_id': user_id,
+                'activity_id': activity_id,
+                'ticket_id': ticket.ticket_id, 
+                'student_id': ticket.owner.student_id, 
+                'time': ticket.activity.time, 
+                'place': ticket.activity.place,
+            }
+            return JsonResponse(ret)
+
+    except:
+        # 由于try中已包含几乎所有情况，出现的except按照查无此票处理
+        # ret msg
+        # ret = {'code': '324', 'msg': None, 'data':{}}
+        # ret['msg'] = '检票失败，该票不存在'
+        # ret['data'] = {
+        #     'user_id': user_id,
+        #     'activity_id': activity_id,
+        # }
+        ret = {'code': '324', 'msg': None, 'data':{}}
+        ret['msg'] = '检票失败，抛出异常'
+        ret['data'] = {
+            'inspector_id': inspector_id,
+            'user_id': user_id,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+# when a user applies to be an inspector of an activity
+def applyInspector(request):
+    # get openid & activity_id
+    openid = request.POST.get('openid')
+    activity_id = request.POST.get('activity_id')
+    
+    # get user
+    try: 
+        user = User.objects.get(openid = openid)
+
+    except:
+        # ret msg
+        ret = {'code': '130', 'msg': None, 'data':{}}
+        ret['msg'] = '发送申请失败，该用户不存在'
+        ret['data'] = {
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+    # get activity
+    try: 
+        activity = Activity.objects.get(activity_id = activity_id)
+
+    except:
+        # ret msg
+        ret = {'code': '230', 'msg': None, 'data':{}}
+        ret['msg'] = '发送申请失败，该活动不存在'
+        ret['data'] = {
+            'openid': openid,
+            'activity_id': activity_id,
+        }
+        return JsonResponse(ret)
+
+    # check if applied
+    for item in user.inspector_apply_list.all():
+        if item.activity_id == activity_id:
+            # ret msg
+            ret = {'code': '230', 'msg': None, 'data':{}}
+            ret['msg'] = '发送申请失败，该用户有尚未处理的相同申请'
+            ret['data'] = {
+                'openid': openid,
+                'activity_id': activity_id,
+            }
+            return JsonResponse(ret)
+    
+    # apply
+    user.inspector_apply_list.add(activity)
+    
+    # save
+    user.save()
+
+    # ret msg
+    ret = {'code': '030', 'msg': None, 'data':{}}
+    ret['msg'] = '发送申请成功，申请等待受理'
+    ret['data'] = {
+        'openid': openid,
+        'activity_id': activity.activity_id,
+    }
+    return JsonResponse(ret)
+
+# 超管专用 admin uses this to know who has applied for being an inspector
+def showAllApply(request):
+    users = User.objects.all()
+    msg = ' '
+    for user in users:
+        for star in user.inspector_apply_list.all():
+            msg = msg + str(user.user_id) + ' : ' + str(star.activity_id) + ' , '
+    if msg == ' ':
+        return HttpResponse("no apply")
+    return HttpResponse(msg)
+
+# show user what activities he/she has applied to be an inspector 你向这些活动提出的检票员申请还未被处理
+def showApplyList(request):
+    # get openid
+    openid = request.POST.get('openid')
+    
+    # get user
+    try: 
+        user = User.objects.get(openid = openid)
+    except:
+        ret = {'code': '132', 'msg': None, 'data':{}}
+        ret['msg'] = '获取检票员申请记录失败，该用户不存在'
+        ret['data'] = {
+            'openid': openid,
+        }
+        return JsonResponse(ret)
+
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    # get apply list
+    actList = user.inspector_apply_list.all()
+    retList = []
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+
+        # save
+        item.save()
+
+        # create json
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            'image': 'http://62.234.50.47' + item.image.url,
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price
+        }
+
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '032', 'msg': None, 'data':{}}
+    ret['msg'] = '获取检票员申请记录成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)
+
+# show user what activities he/she is an inspector 你是这些活动的检票员
+def showInspectorList(request):
+    # get openid
+    openid = request.POST.get('openid')
+    
+    # get user
+    try: 
+        user = User.objects.get(openid = openid)
+    except:
+        ret = {'code': '132', 'msg': None, 'data':{}}
+        ret['msg'] = '获取检票员信息失败，该用户不存在'
+        ret['data'] = {
+            'openid': openid,
+        }
+        return JsonResponse(ret)
+
+    # encode date
+    class DateEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return json.JSONEncoder.default(self, obj)
+    
+    # get apply list
+    actList = user.inspector_list.all()
+    retList = []
+    for item in actList:
+        # update status
+        current_time = datetime.datetime.now()
+        if item.time <= current_time:
+            item.status = u'已结束'
+            item.heat = item.min_heat
+        elif item.remain <= 0:
+            item.status = u'已售空'
+
+        # save
+        item.save()
+
+        # create json
+        i = {
+            'activity_id': item.activity_id, 
+            'title': item.title, 
+            'image': 'http://62.234.50.47' + item.image.url,
+            'status': item.status,
+            'remain': item.remain,
+            'publisher': item.publisher,
+            'description': item.description,
+            'time': item.time,
+            'place': item.place, 
+            'price': item.price
+        }
+
+        iJson = json.dumps(i, cls = DateEncoder) # 注意调用新的json序列化类
+        retList.append(iJson)
+    
+    # ret msg
+    ret = {'code': '032', 'msg': None, 'data':{}}
+    ret['msg'] = '获取检票员信息成功'
+    ret['data'] = {
+        'activityList': retList,
+    }
+    return JsonResponse(ret)

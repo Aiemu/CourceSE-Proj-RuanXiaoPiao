@@ -20,6 +20,9 @@ class Activity(models.Model):
     # arrive_change = models.FloatField(default = 2.5) # 到场时的热度变化
     # max_heat = models.FloatField(default = 1000)
     min_heat = models.FloatField(default = 0) # 活动过期后置为最低热度
+
+    # 该活动有以下检票员
+    # inspectors = models.ManyToManyField(User)
     
     class Meta:
         db_table = 'Activity'
@@ -27,11 +30,17 @@ class Activity(models.Model):
 class User(models.Model):
     # basic info
     user_id = models.AutoField(primary_key = True)
-    openid = models.CharField( max_length = 30)
+    openid = models.CharField(max_length = 30)
     username = models.CharField(max_length = 30)
     password = models.CharField(max_length = 30)
-    student_id =  models.CharField(max_length = 10)
-    starred = models.ManyToManyField(Activity)
+    student_id =  models.CharField(max_length = 10, default=0, blank=True, null=True)
+    # ManyToManyField中没有null，设置blank以实现可在admin中置空
+    # 关联一个外键多次时，需使用related_name
+    starred = models.ManyToManyField(Activity, related_name='starred', blank=True)
+    # 该用户向以下活动提出了待处理的检票员申请
+    inspector_apply_list = models.ManyToManyField(Activity, related_name='inspector_apply_list', blank=True)
+    # 该用户是以下活动的检票员
+    inspector_list = models.ManyToManyField(Activity, related_name='inspector_list', blank=True)
 
     # varify info
     is_verified = models.BooleanField(default=False) # 学号登录验证接口

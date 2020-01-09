@@ -12,9 +12,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# paths inside the project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Quick-start development settings - unsuitable for production
@@ -29,7 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['62.234.50.47', 'localhost', '127.0.0.1']
 
 # Application definition
-
 INSTALLED_APPS = [
     'rest_framework',
     'django.contrib.admin',
@@ -40,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 添加计时器  warning: 必须在APP之前
     # 'django_crontab',
-    # 添加APP
+    # Application definition
     'test_app',
 ]
 
@@ -91,7 +89,10 @@ DATABASES = {
         'TEST': {
             'CHARSET': 'utf8',
             'COLLATION': 'utf8_general_ci',
-        }
+        },
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        },
     }
 }
 
@@ -118,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-# LANGUAGE_CODE = 'en-us'
+# time and language
 LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
@@ -132,8 +133,8 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+# url path
 STATIC_URL = '/static/'
-
 MEDIA_URL = '/media/'
 
 # # 配置计时器

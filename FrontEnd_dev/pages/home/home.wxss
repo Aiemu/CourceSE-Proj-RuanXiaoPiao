@@ -25,10 +25,13 @@
   flex-direction: column;
   justify-content: space-between;
 }
+<<<<<<< HEAD
 .inspector{
   position: absolute;
   right: 10rpx;
 }
+=======
+>>>>>>> back-end-dev
 .logo{
   overflow: hidden;
   display: block;
@@ -57,7 +60,11 @@
 
 .btn_verify{
   margin-top: 20rpx;
+<<<<<<< HEAD
   margin-left: 10rpx;
   margin-right: 10rpx;
   background-color: #2ecc71;
+=======
+  background-color: gray;
+>>>>>>> back-end-dev
 }

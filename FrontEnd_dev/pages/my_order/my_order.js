@@ -32,7 +32,10 @@ Page({
         for (var i = 0; i < list.length; i++) {
           list[i] = JSON.parse(list[i])
         }
+<<<<<<< HEAD
         console.log(list)
+=======
+>>>>>>> back-end-dev
         that.setData({
           orderlist: list
         })

@@ -39,10 +39,10 @@ Page({
                 var postData = {
                     // code: data.code,
                     openid: 'oNEnn5bp28pd7N7RKKLKyu5V8G1w',
-                    // openid: 'testOpenid',
+                    // student_id: '2017010001',
                 };
                 wx.request({
-                    url: 'http://62.234.50.47/verifyUser/',
+                    url: 'http://127.0.0.1:8000/verifyUser/',
                     data: postData,
                     method: 'POST',
                     header: {

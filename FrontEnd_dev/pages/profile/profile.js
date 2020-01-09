@@ -1,49 +1,18 @@
-// pages/ticket/ticket.js
-const app = getApp()
+// pages/profile/profile.js
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    info: {},
-<<<<<<< HEAD
-    is_refund: false,
-=======
-    is_refund: true,
->>>>>>> back-end-dev
+
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    var that = this
-    var postData = {
-      openid: app.globalData.openId,
-      ticket_id: options.id
-    };
-    wx.request({
-      url: 'http://62.234.50.47/getTicketInfo/',
-      data: postData,
-      method: 'POST',
-      header: {
-        'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-      },
-      success: function (res) {
-<<<<<<< HEAD
-        console.log(res.data)
-=======
->>>>>>> back-end-dev
-        //回调处理
-        that.setData({
-          info: res.data.data
-        })
-      },
-      fail: function (error) {
-        console.log(error);
-      }
-    })
+
   },
 
   /**

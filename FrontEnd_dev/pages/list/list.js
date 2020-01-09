@@ -112,7 +112,35 @@ Page({
             fail: function (error) {
                 console.log(error);
             }
-        })
+            wx.request({
+                url: 'http://62.234.50.47/init/',
+                data: postData,
+                method: 'POST',
+                header: {
+                    'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+                },
+                success: function (res) {
+                    //回调处理
+                    console.log('getOpenID-OK!');
+                    console.log(res.data);
+                    // 本地存储openid
+                    app.globalData.openId = res.data.data.openid
+                    wx.setStorageSync('OPENID', res.data.data.openid)
+                    console.log(app.globalData)
+                    that.ifNeedAuth = false
+                    that.setData({
+                      ifNeedAuth: false
+                    })
+                },
+                fail: function (error) {
+                    console.log(error);
+                }
+            })
+        },
+        fail: function () {
+            console('登录获取Code失败！');
+        }
+      })
     },
     getSortedList(e) {
         var index = e.detail.name
