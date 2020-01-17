@@ -4,10 +4,10 @@
     appid: wx7d93bbb34a8d3662
 
 ## 分支(Branch)说明
-	- master: 会议记录、参考资料、最终提交src、文档等
-	- userUI: 用于用户端用户界面前端开发测试
-	- back-end-dev: 用于后端开发测试（包含后端测试用前端）
-	- front—end-dev: 用于用户端首页界面开发测试
+- master: 会议记录、参考资料、最终提交src、文档等
+- userUI: 用于用户端用户界面前端开发测试
+- back-end-dev: 用于后端开发测试（包含后端测试用前端）
+- front—end-dev: 用于用户端首页界面开发测试
 
 ## 小程序UI组织结构
     详情 --> 20191012zengzheng.md

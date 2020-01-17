@@ -105,20 +105,10 @@ def verifyUser(request):
         student_id: flag to verify
     Returns: 
         {code: 101, msg: 认证失败，该用户不存在, data: {openid(str)}}
-        {code: 001, msg: 认证成功, data: {openid(str), student_id(str)}}
+        {code: 001, msg: 认证成功, data: {openid(str)}}
     '''
     # get openid & student_id
     openid = request.POST.get('openid')
-    student_id = request.POST.get('student_id')
-
-    if student_id == None:
-        ret = {'code': '401', 'msg': None, 'data':{}}
-        ret['msg'] = '认证失败，无学号'
-        ret['data'] = {
-            'openid': openid,
-        }
-        return JsonResponse(ret)
-
     # get user
     try: 
         user = User.objects.get(openid = openid)
@@ -132,7 +122,6 @@ def verifyUser(request):
     
     # update user
     user.is_verified = True
-    user.student_id = student_id
 
     # save
     user.save()
@@ -142,7 +131,6 @@ def verifyUser(request):
     ret['msg'] = '认证成功'
     ret['data'] = {
         'openid': openid,
-        'student_id': student_id,
     }
     return JsonResponse(ret)
 
